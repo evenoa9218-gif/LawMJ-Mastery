@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LawMJ Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f4ef; --bg2:#eceae4; --card:#ffffff; --border:#dddbd5;
+  --text:#1a1a2e; --text2:#4a4a6a; --text3:#9090a8;
+  --primary:#3b5bdb; --primary-light:#e8ecff;
+  --accent:#e03131; --success:#2f9e44; --warning:#f59f00; --star:#f59f00;
+  --sb-bg:#1b2445; --sb-text:#bbc8e8; --sb-active:#4a6cf7; --sb-hover:#232f58;
+  --topbar:#ffffff; --shadow:0 2px 10px rgba(0,0,0,0.07); --radius:10px;
+}
+[data-theme="dark"] {
+  --bg:#0d0f1a; --bg2:#13162a; --card:#1a1d30; --border:#252840;
+  --text:#e8e6f0; --text2:#a0a0c0; --text3:#606080;
+  --primary:#6b8cff; --primary-light:#1a2060;
+  --accent:#ff6b6b; --success:#51cf66; --warning:#fcc419; --star:#fcc419;
+  --sb-bg:#0b0e1e; --sb-text:#8898bb; --sb-active:#3d5bd9; --sb-hover:#141828;
+  --topbar:#13162a; --shadow:0 2px 10px rgba(0,0,0,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:252px;min-width:252px;background:var(--sb-bg);display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden;flex-shrink:0}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:#2a3a62;border-radius:3px}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sb-logo-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.sb-logo-sub{font-size:10px;color:#5a6a8a;margin-top:3px}
+.sb-module-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;user-select:none;color:var(--sb-text);font-size:10.5px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;transition:background 0.15s}
+.sb-module-header:hover{background:var(--sb-hover)}
+.sb-module-header .chv{transition:transform 0.2s;font-size:9px;opacity:0.6}
+.sb-module-header.open .chv{transform:rotate(90deg)}
+.sb-topics{}
+.sb-topic{display:flex;align-items:center;gap:7px;padding:7px 16px 7px 26px;cursor:pointer;color:#7080a0;font-size:12px;transition:all 0.15s;border-left:2px solid transparent}
+.sb-topic:hover{background:var(--sb-hover);color:#bbc8e8}
+.sb-topic.active{background:rgba(74,108,247,0.12);color:#7a9eff;border-left-color:var(--sb-active)}
+.sb-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.5;flex-shrink:0}
+.sb-topic.active .sb-dot{opacity:1;background:var(--sb-active)}
+.sb-pct{margin-left:auto;font-size:10px;opacity:0.5}
+.sb-stats{margin-top:auto;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#5a6a8a}
+.sb-stats strong{color:#8898bb}
+
+/* MAIN */
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--topbar);border-bottom:1px solid var(--border);padding:0 22px;height:50px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.breadcrumb{flex:1;font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:5px;overflow:hidden}
+.breadcrumb .bc-link{color:var(--primary);cursor:pointer;white-space:nowrap}
+.breadcrumb .bc-link:hover{text-decoration:underline}
+.breadcrumb .bc-sep{color:var(--text3)}
+.breadcrumb strong{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{width:32px;height:32px;border:1px solid var(--border);border-radius:7px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text2);transition:all 0.15s;flex-shrink:0}
+.tbtn:hover{background:var(--bg2);color:var(--primary)}
+.content{flex:1;overflow-y:auto;padding:22px 24px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* HUB */
+.hub-title{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;margin-bottom:5px}
+.hub-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+.hub-stats{display:flex;gap:12px;margin-bottom:26px;flex-wrap:wrap}
+.hstat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:90px;text-align:center;flex:1}
+.hstat-num{font-size:22px;font-weight:700;color:var(--primary);font-family:'Noto Serif KR',serif}
+.hstat-label{font-size:10.5px;color:var(--text3);margin-top:2px}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.mcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mcard:nth-child(1)::before{background:#3b5bdb}
+.mcard:nth-child(2)::before{background:#0ca678}
+.mcard:nth-child(3)::before{background:#e8590c}
+.mcard:nth-child(4)::before{background:#9c36b5}
+.mcard:nth-child(5)::before{background:#1971c2}
+.mcard:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--primary)}
+.mcard-icon{font-size:26px;margin-bottom:8px}
+.mcard-name{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.mcard-topics{font-size:11px;color:var(--text3);margin-bottom:12px}
+.mpbar{height:4px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.mpbar-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.mpbar-text{font-size:10.5px;color:var(--text3)}
+.mcard-stats{display:flex;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.mcs{font-size:10.5px;color:var(--text3)}
+.mcs strong{color:var(--text2);font-weight:600}
+
+/* TOPIC */
+.topic-title{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;margin-bottom:3px}
+.topic-meta{font-size:11.5px;color:var(--text3);margin-bottom:18px}
+.tabs{display:flex;gap:2px;background:var(--bg2);border-radius:9px;padding:3px;margin-bottom:18px;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:7px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text2);white-space:nowrap;transition:all 0.15s}
+.tab-btn:hover{background:var(--card);color:var(--text)}
+.tab-btn.active{background:var(--card);color:var(--primary);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+
+/* CONCEPT */
+.concept-list{display:flex;flex-direction:column;gap:14px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.ccard-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px}
+.ccard-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700}
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.b3{background:#fff0f0;color:#e03131}
+.b2{background:#fff8e0;color:#e67700}
+.b1{background:#e8ecff;color:#3b5bdb}
+[data-theme="dark"] .b3{background:#3a0e0e;color:#ff8080}
+[data-theme="dark"] .b2{background:#2e1e00;color:#fcc419}
+[data-theme="dark"] .b1{background:#0e1640;color:#6b8cff}
+.ccard-body{font-size:13.5px;line-height:1.9;color:var(--text2);white-space:pre-wrap}
+.atags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.atag{padding:2px 9px;background:var(--primary-light);color:var(--primary);border-radius:4px;font-size:10.5px;font-weight:600;cursor:pointer}
+.atag:hover{opacity:0.75}
+
+/* CASE */
+.case-filters{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.fbtn{padding:5px 13px;border:1px solid var(--border);border-radius:20px;background:var(--card);cursor:pointer;font-size:11.5px;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all 0.15s}
+.fbtn:hover{border-color:var(--primary);color:var(--primary)}
+.fbtn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.case-grid{display:flex;flex-direction:column;gap:12px}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:box-shadow 0.2s}
+.pcard:hover{box-shadow:var(--shadow)}
+.pcard-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.pcard-no{font-size:11.5px;color:var(--text3);font-family:monospace}
+.pcard-stars{color:var(--star);font-size:11px;letter-spacing:-1px}
+.pcard-issue{font-weight:700;font-size:14.5px;margin-bottom:9px}
+.pcard-sec{margin-bottom:7px}
+.pcard-sec-lbl{font-size:9.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.pcard-sec-txt{font-size:13px;line-height:1.75;color:var(--text2)}
+.pcard-sig{margin-top:9px;padding:7px 11px;background:var(--primary-light);border-radius:6px;font-size:12px;color:var(--primary)}
+
+/* QUIZ */
+.qcontrols{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.qprogress{font-size:12px;color:var(--text3);margin-left:auto}
+.qwrap{max-width:680px;margin:0 auto}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 26px;min-height:180px;margin-bottom:14px}
+.qcard-top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.qbadge{padding:2px 9px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.3px}
+.qb-ox{background:#e8ecff;color:#3b5bdb}
+.qb-mcq{background:#fff0f6;color:#c2255c}
+.qb-case{background:#e6fcf5;color:#0ca678}
+.qb-blank{background:#fff8e0;color:#e67700}
+[data-theme="dark"] .qb-ox{background:#0e1640;color:#6b8cff}
+[data-theme="dark"] .qb-mcq{background:#280a18;color:#f06595}
+[data-theme="dark"] .qb-case{background:#061e18;color:#38d9a9}
+[data-theme="dark"] .qb-blank{background:#281800;color:#fcc419}
+.qstar{color:var(--star);font-size:13px}
+.qfact{background:var(--bg2);border-left:3px solid var(--primary);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;line-height:1.8;color:var(--text2);margin-bottom:14px}
+.qquestion{font-size:14.5px;line-height:1.85;color:var(--text);margin-bottom:18px}
+
+/* OX */
+.ox-row{display:flex;gap:14px;justify-content:center;margin:4px 0}
+.oxbtn{width:76px;height:76px;border-radius:50%;border:2px solid var(--border);background:var(--card);font-size:28px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.oxbtn:hover{transform:scale(1.07)}
+.obtn:hover,.obtn.sel-o{border-color:var(--success);background:rgba(47,158,68,0.09)}
+.xbtn:hover,.xbtn.sel-x{border-color:var(--accent);background:rgba(224,49,49,0.09)}
+.oxbtn.ans-ok{border-color:var(--success)!important;background:rgba(47,158,68,0.13)!important}
+.oxbtn.ans-ng{border-color:var(--accent)!important;background:rgba(224,49,49,0.13)!important}
+
+/* MCQ */
+.mcq-opts{display:flex;flex-direction:column;gap:7px}
+.mopt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;font-size:13.5px;line-height:1.7;color:var(--text2);background:var(--card);transition:all 0.15s}
+.mopt:hover{border-color:var(--primary);color:var(--text);background:var(--primary-light)}
+.mopt.m-correct{border-color:var(--success);background:rgba(47,158,68,0.08);color:var(--text)}
+.mopt.m-wrong{border-color:var(--accent);background:rgba(224,49,49,0.08);color:var(--text)}
+.mopt-n{font-weight:700;color:var(--primary);flex-shrink:0;width:18px}
+
+/* Explanation */
+.qexp{margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:7px;border-left:3px solid var(--primary);font-size:13px;line-height:1.8;color:var(--text2);display:none}
+.qexp.show{display:block}
+.qres{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:4px;font-size:11.5px;font-weight:700;margin-bottom:7px}
+.qres.ok{background:rgba(47,158,68,0.13);color:var(--success)}
+.qres.ng{background:rgba(224,49,49,0.13);color:var(--accent)}
+
+/* BLANK */
+.blank-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.blank-inp{flex:1;padding:9px 13px;border:1.5px solid var(--border);border-radius:7px;background:var(--card);color:var(--text);font-size:13.5px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.15s}
+.blank-inp:focus{border-color:var(--primary)}
+.blank-inp.ok{border-color:var(--success)}
+.blank-inp.ng{border-color:var(--accent)}
+
+/* CASE PROB */
+.case-facts{background:var(--bg2);border-left:3px solid #0ca678;padding:12px 15px;border-radius:0 7px 7px 0;margin-bottom:12px;font-size:13.5px;line-height:1.8;color:var(--text2)}
+.case-q{font-size:14.5px;font-weight:600;color:var(--text);margin-bottom:14px}
+.case-ans-btn{padding:9px 18px;border:1.5px solid #0ca678;border-radius:7px;background:transparent;color:#0ca678;font-size:12.5px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all 0.15s}
+.case-ans-btn:hover{background:rgba(12,166,120,0.09)}
+.case-ans{margin-top:12px;padding:14px 16px;background:rgba(12,166,120,0.06);border:1px solid rgba(12,166,120,0.25);border-radius:7px;font-size:13.5px;line-height:1.85;color:var(--text2);display:none}
+.case-ans.show{display:block}
+
+/* NAV */
+.qnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
+.nbtn{padding:8px 18px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--text2);font-size:12.5px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all 0.15s}
+.nbtn:hover{border-color:var(--primary);color:var(--primary)}
+.nbtn:disabled{opacity:0.35;cursor:not-allowed}
+.nbtn.pri{background:var(--primary);color:#fff;border-color:var(--primary)}
+.nbtn.pri:hover{opacity:0.9;color:#fff}
+
+/* FLASHCARD */
+.flash-wrap{max-width:580px;margin:0 auto}
+.flash-ctr{font-size:12.5px;color:var(--text3);text-align:center;margin-bottom:6px}
+.flash-hint{font-size:11px;color:var(--text3);text-align:center;margin-bottom:14px}
+.flash-scene{perspective:1200px;height:270px;margin-bottom:18px;cursor:pointer}
+.flash-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.48s cubic-bezier(0.4,0,0.2,1)}
+.flash-inner.flipped{transform:rotateY(180deg)}
+.flash-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;border:1px solid var(--border);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flash-front{background:var(--card)}
+.flash-back{background:var(--primary);transform:rotateY(180deg)}
+[data-theme="dark"] .flash-back{background:#1e2d7a}
+.flash-face-lbl{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0.45;margin-bottom:14px}
+.flash-front-text{font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;color:var(--text);line-height:1.5}
+.flash-back-text{font-size:13.5px;line-height:1.9;color:rgba(255,255,255,0.92);white-space:pre-wrap}
+.flash-cat{position:absolute;top:10px;right:12px;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--primary-light);color:var(--primary)}
+.flash-back .flash-cat{background:rgba(255,255,255,0.18);color:rgba(255,255,255,0.75)}
+
+/* SEARCH */
+.soverlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:70px}
+.soverlay.show{display:flex}
+.sbox{width:580px;max-width:92vw;background:var(--card);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden}
+.sinput-row{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);gap:10px}
+.sinput{flex:1;border:none;background:transparent;font-size:15px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none}
+.sinput::placeholder{color:var(--text3)}
+.sresults{max-height:380px;overflow-y:auto}
+.sri{padding:11px 18px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s}
+.sri:hover{background:var(--bg2)}
+.sri:last-child{border-bottom:none}
+.sri-type{font-size:9.5px;color:var(--text3);margin-bottom:2px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase}
+.sri-title{font-size:13.5px;color:var(--text);font-weight:500}
+.sri-sub{font-size:11.5px;color:var(--text2);margin-top:1px}
+.sempty{padding:28px;text-align:center;color:var(--text3);font-size:13px}
+
+/* WRONG NOTE FAB */
+.fab{position:fixed;bottom:22px;right:22px;width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 4px 16px rgba(59,91,219,0.38);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
+.fab:hover{transform:scale(1.1)}
+.fab-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--accent);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none}
+.fab-badge.show{display:flex}
+
+/* EMPTY */
+.empty{text-align:center;padding:56px 20px;color:var(--text3)}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-ttl{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.empty-sub{font-size:12.5px}
+
+/* WRONG NOTE PAGE */
+.wn-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.wn-meta{font-size:10.5px;color:var(--text3);margin-bottom:6px}
+.wn-q{font-size:13.5px;color:var(--text);margin-bottom:8px;line-height:1.7}
+.wn-exp{font-size:12.5px;color:var(--text2);line-height:1.75;padding:8px 11px;background:var(--bg2);border-radius:6px}
+
+@media(max-width:780px){
+  .sidebar{width:220px;min-width:220px;position:fixed;z-index:90;transform:translateX(-100%);transition:transform 0.28s}
+  .sidebar.open{transform:translateX(0)}
+  .hub-stats{flex-wrap:wrap}
+  .hstat{min-width:calc(50% - 6px)}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">⚖️ LawMJ Mastery</div>
+    <div class="sb-logo-sub">민법 교과서 완전학습 플랫폼</div>
+  </div>
+  <div id="sb-nav"></div>
+  <div class="sb-stats" id="sb-stats"></div>
+</aside>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <button class="tbtn" onclick="openSearch()" title="검색 (⌘K)">🔍</button>
+    <button class="tbtn" onclick="toggleTheme()" id="theme-btn" title="테마 전환">🌙</button>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<div class="soverlay" id="soverlay" onclick="closeSOverlay(event)">
+  <div class="sbox">
+    <div class="sinput-row">
+      <span style="font-size:16px;color:var(--text3)">🔍</span>
+      <input class="sinput" id="sinput" placeholder="조문번호, 판례, 개념, 키워드 검색... (예: §750, 대판 2003, 불법행위)" oninput="doSearch(this.value)">
+      <button class="tbtn" style="border:none" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="sresults" id="sresults"><div class="sempty">검색어를 입력하세요</div></div>
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="showWrongNote()" title="오답노트">📕
+  <div class="fab-badge" id="fab-badge">0</div>
+</button>
+
+<script>
+// ================================================================
+// ① 데이터 배열 (아카이빙 시 순차적으로 채움)
+// 포맷:
+//  CONCEPT:   [id, title, body, article_refs[], importance(1-3), topic]
+//  CASE:      [id, case_no, issue, holding, significance, article_refs[], stars(1-3), topic]
+//  QUIZ:      [id, type, question, answer, explanation, topic]
+//             type → "OX"(answer:true/false) | "MCQ"(answer:"①"~"⑤") | "CASE"(answer:"OPEN") | "BLANK"(answer:string)
+//             MCQ question 형식: "질문§①선지1§②선지2§③선지3§④선지4§⑤선지5"
+//             공통사실 있을 시: "사실관계§질문§①선지1§..."  / OX: "사실관계§★지문"
+//  FLASHCARD: [id, front, back, category, topic]
+//             category → "concept"|"case"|"article"|"compare"
+// ================================================================
+
+const 총칙_CONCEPT = [
+]
+const 총칙_CASE = [
+]
+const 총칙_QUIZ = [
+]
+const 총칙_FLASHCARD = [
+]
+
+const 물권_CONCEPT = [
+]
+const 물권_CASE = [
+]
+const 물권_QUIZ = [
+]
+const 물권_FLASHCARD = [
+]
+
+const 채권총론_CONCEPT = [
+]
+const 채권총론_CASE = [
+]
+const 채권총론_QUIZ = [
+]
+const 채권총론_FLASHCARD = [
+]
+
+const 채권각론_CONCEPT = [
+]
+const 채권각론_CASE = [
+]
+const 채권각론_QUIZ = [
+]
+const 채권각론_FLASHCARD = [
+]
+
+const 친족상속_CONCEPT = [
+]
+const 친족상속_CASE = [
+]
+const 친족상속_QUIZ = [
+]
+const 친족상속_FLASHCARD = [
+]
+
+// ================================================================
+// ② MODULE REGISTRY
+// ================================================================
+const MODULES = [
+  {
+    key:'총칙', name:'민법총칙', icon:'📜', color:'#3b5bdb',
+    con:총칙_CONCEPT, cas:총칙_CASE, qui:총칙_QUIZ, fla:총칙_FLASHCARD,
+    topics:[
+      {key:'법원총칙서론',   label:'민법의 의의·법원·해석'},
+      {key:'권리주체자연인', label:'자연인 (능력·주소·부재·실종)'},
+      {key:'권리주체법인',   label:'법인'},
+      {key:'권리객체',       label:'물건'},
+      {key:'법률행위',       label:'법률행위 총론'},
+      {key:'의사표시',       label:'의사표시'},
+      {key:'대리',           label:'대리'},
+      {key:'무효취소',       label:'무효와 취소'},
+      {key:'조건기한',       label:'조건·기한'},
+      {key:'기간',           label:'기간'},
+      {key:'소멸시효',       label:'소멸시효'},
+    ]
+  },
+  {
+    key:'물권', name:'물권법', icon:'🏛️', color:'#0ca678',
+    con:물권_CONCEPT, cas:물권_CASE, qui:물권_QUIZ, fla:물권_FLASHCARD,
+    topics:[
+      {key:'물권총론', label:'물권 총론'},
+      {key:'물권변동', label:'물권변동'},
+      {key:'점유권',   label:'점유권'},
+      {key:'소유권',   label:'소유권'},
+      {key:'지상권',   label:'지상권'},
+      {key:'지역권',   label:'지역권'},
+      {key:'전세권',   label:'전세권'},
+      {key:'유치권',   label:'유치권'},
+      {key:'질권',     label:'질권'},
+      {key:'저당권',   label:'저당권'},
+    ]
+  },
+  {
+    key:'채권총론', name:'채권총론', icon:'🤝', color:'#e8590c',
+    con:채권총론_CONCEPT, cas:채권총론_CASE, qui:채권총론_QUIZ, fla:채권총론_FLASHCARD,
+    topics:[
+      {key:'채권목적',       label:'채권의 목적'},
+      {key:'채권효력',       label:'채권의 효력'},
+      {key:'채권자대위',     label:'채권자대위권'},
+      {key:'사해행위취소',   label:'사해행위취소권'},
+      {key:'다수당사자채권', label:'다수당사자의 채권관계'},
+      {key:'채권양도',       label:'채권양도·채무인수'},
+      {key:'채권소멸',       label:'채권소멸'},
+    ]
+  },
+  {
+    key:'채권각론', name:'채권각론', icon:'📋', color:'#9c36b5',
+    con:채권각론_CONCEPT, cas:채권각론_CASE, qui:채권각론_QUIZ, fla:채권각론_FLASHCARD,
+    topics:[
+      {key:'계약총론', label:'계약 총론'},
+      {key:'매매',     label:'매매'},
+      {key:'임대차',   label:'임대차'},
+      {key:'도급위임', label:'도급·위임'},
+      {key:'기타계약', label:'기타 유명계약'},
+      {key:'사무관리', label:'사무관리'},
+      {key:'부당이득', label:'부당이득'},
+      {key:'불법행위', label:'불법행위'},
+    ]
+  },
+  {
+    key:'친족상속', name:'친족·상속', icon:'👨‍👩‍👧', color:'#1971c2',
+    con:친족상속_CONCEPT, cas:친족상속_CASE, qui:친족상속_QUIZ, fla:친족상속_FLASHCARD,
+    topics:[
+      {key:'친족총론', label:'친족 총론'},
+      {key:'혼인',     label:'혼인·이혼'},
+      {key:'친자',     label:'친자·입양'},
+      {key:'후견',     label:'후견'},
+      {key:'상속',     label:'상속'},
+      {key:'유언',     label:'유언'},
+      {key:'유류분',   label:'유류분'},
+    ]
+  },
+];
+
+const TAB_TYPE = {ox:'OX', mcq:'MCQ', case_q:'CASE', blank:'BLANK'};
+
+// ================================================================
+// ③ STATE
+// ================================================================
+let S = {
+  modKey:null, topicKey:null, tab:'concept',
+  qIdx:0, qFilter:'all', qAnswered:null,
+  fIdx:0, fFlipped:false,
+  cFilter:'all',
+  openMods:{'총칙':true},
+};
+
+// ================================================================
+// ④ PROGRESS (localStorage)
+// ================================================================
+const STORE = 'lawmj_v1';
+let P = {};
+function loadP(){try{P=JSON.parse(localStorage.getItem(STORE)||'{}')}catch(e){P={}}}
+function saveP(){localStorage.setItem(STORE,JSON.stringify(P))}
+function getP(tk){return P[tk]||(P[tk]={ox_ok:[],ox_ng:[],mcq_ok:[],mcq_ng:[],blank_ok:[],blank_ng:[],con_done:[],cas_done:[],fla_done:[]}),P[tk]}
+
+function recordOx(id,ok){const p=getP(S.topicKey);if(ok){p.ox_ok=[...new Set([...p.ox_ok,id])];p.ox_ng=p.ox_ng.filter(x=>x!==id)}else{p.ox_ng=[...new Set([...p.ox_ng,id])]};saveP()}
+function recordMcq(id,ok){const p=getP(S.topicKey);if(ok){p.mcq_ok=[...new Set([...p.mcq_ok,id])];p.mcq_ng=p.mcq_ng.filter(x=>x!==id)}else{p.mcq_ng=[...new Set([...p.mcq_ng,id])]};saveP()}
+function recordBlank(id,ok){const p=getP(S.topicKey);if(ok){p.blank_ok=[...new Set([...p.blank_ok,id])];p.blank_ng=p.blank_ng.filter(x=>x!==id)}else{p.blank_ng=[...new Set([...p.blank_ng,id])]};saveP()}
+
+function modPct(mod){
+  let tot=0,done=0;
+  mod.topics.forEach(t=>{
+    const p=getP(t.key);
+    const ox=mod.qui.filter(q=>q[5]===t.key&&q[1]==='OX');
+    const mcq=mod.qui.filter(q=>q[5]===t.key&&q[1]==='MCQ');
+    tot+=ox.length+mcq.length;
+    done+=p.ox_ok.filter(id=>ox.find(q=>q[0]===id)).length+p.mcq_ok.filter(id=>mcq.find(q=>q[0]===id)).length;
+  });
+  return tot===0?0:Math.min(100,Math.round(done/tot*100));
+}
+function topicPct(mod,tk){
+  const p=getP(tk);
+  const items=mod.qui.filter(q=>q[5]===tk);
+  if(!items.length)return 0;
+  const done=[...p.ox_ok,...p.mcq_ok,...p.blank_ok].filter(id=>items.find(q=>q[0]===id)).length;
+  return Math.min(100,Math.round(done/items.length*100));
+}
+function allWrong(){
+  const w=[];
+  MODULES.forEach(m=>m.qui.forEach(q=>{
+    const p=getP(q[5]);
+    const ng=q[1]==='OX'?p.ox_ng:q[1]==='MCQ'?p.mcq_ng:p.blank_ng;
+    if(ng.includes(q[0]))w.push({q,mod:m});
+  }));
+  return w;
+}
+
+// ================================================================
+// ⑤ SIDEBAR
+// ================================================================
+function renderSB(){
+  const wrong=allWrong().length;
+  let h='';
+  MODULES.forEach(m=>{
+    const open=S.openMods[m.key];
+    h+=`<div><div class="sb-module-header ${open?'open':''}" onclick="toggleMod('${m.key}')"><span>${m.icon} ${m.name}</span><span class="chv">▶</span></div>`;
+    h+=`<div style="display:${open?'block':'none'}">`;
+    m.topics.forEach(t=>{
+      const act=S.modKey===m.key&&S.topicKey===t.key;
+      const pct=topicPct(m,t.key);
+      h+=`<div class="sb-topic ${act?'active':''}" onclick="goTopic('${m.key}','${t.key}')"><span class="sb-dot"></span><span>${t.label}</span>${pct>0?`<span class="sb-pct">${pct}%</span>`:''}</div>`;
+    });
+    h+='</div></div>';
+  });
+  document.getElementById('sb-nav').innerHTML=h;
+  const totalQ=MODULES.reduce((a,m)=>a+m.qui.length,0);
+  document.getElementById('sb-stats').innerHTML=`전체 문제 <strong>${totalQ}</strong>개 &nbsp;·&nbsp; 오답 <strong style="color:#ff7070">${wrong}</strong>개`;
+  const badge=document.getElementById('fab-badge');
+  badge.textContent=wrong;
+  badge.classList.toggle('show',wrong>0);
+}
+function toggleMod(k){S.openMods[k]=!S.openMods[k];renderSB()}
+
+// ================================================================
+// ⑥ NAVIGATION
+// ================================================================
+function goHub(){S.modKey=null;S.topicKey=null;renderSB();renderBC();renderHub()}
+function goTopic(mk,tk){
+  S.modKey=mk;S.topicKey=tk;S.tab='concept';S.qIdx=0;S.qAnswered=null;S.fIdx=0;S.fFlipped=false;S.openMods[mk]=true;
+  renderSB();renderBC();renderTopic();
+}
+function renderBC(){
+  const bc=document.getElementById('breadcrumb');
+  if(!S.modKey){bc.innerHTML='<span class="bc-link" onclick="goHub()">🏠 홈</span>';return}
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const t=m&&m.topics.find(x=>x.key===S.topicKey);
+  bc.innerHTML=`<span class="bc-link" onclick="goHub()">🏠 홈</span><span class="bc-sep">›</span><span class="bc-link" onclick="goTopic('${m.key}','${m.topics[0].key}')">${m.name}</span>${t?`<span class="bc-sep">›</span><strong>${t.label}</strong>`:''}`;
+}
+
+// ================================================================
+// ⑦ HUB
+// ================================================================
+function renderHub(){
+  const tC=MODULES.reduce((a,m)=>a+m.con.length,0);
+  const tP=MODULES.reduce((a,m)=>a+m.cas.length,0);
+  const tQ=MODULES.reduce((a,m)=>a+m.qui.length,0);
+  const tF=MODULES.reduce((a,m)=>a+m.fla.length,0);
+  const tW=allWrong().length;
+  let h=`
+    <div class="hub-title">⚖️ LawMJ Mastery</div>
+    <div class="hub-sub">민법 교과서 완전학습 플랫폼 · 개념 아카이브 · 판례 카드 · OX · 객관식 · 사례 · 빈칸 · 플래시카드</div>
+    <div class="hub-stats">
+      <div class="hstat"><div class="hstat-num">${tC}</div><div class="hstat-label">개념</div></div>
+      <div class="hstat"><div class="hstat-num">${tP}</div><div class="hstat-label">판례</div></div>
+      <div class="hstat"><div class="hstat-num">${tQ}</div><div class="hstat-label">문제</div></div>
+      <div class="hstat"><div class="hstat-num">${tF}</div><div class="hstat-label">플래시카드</div></div>
+      <div class="hstat"><div class="hstat-num" style="color:var(--accent)">${tW}</div><div class="hstat-label">오답</div></div>
+    </div>
+    <div class="module-grid">`;
+  MODULES.forEach(m=>{
+    const pct=modPct(m);
+    h+=`<div class="mcard" onclick="goTopic('${m.key}','${m.topics[0].key}')">
+      <div class="mcard-icon">${m.icon}</div>
+      <div class="mcard-name">${m.name}</div>
+      <div class="mcard-topics">${m.topics.length}개 단원</div>
+      <div class="mpbar"><div class="mpbar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+      <div class="mpbar-text">${pct}% 완료</div>
+      <div class="mcard-stats">
+        <div class="mcs">개념 <strong>${m.con.length}</strong></div>
+        <div class="mcs">판례 <strong>${m.cas.length}</strong></div>
+        <div class="mcs">문제 <strong>${m.qui.length}</strong></div>
+        <div class="mcs">카드 <strong>${m.fla.length}</strong></div>
+      </div>
+    </div>`;
+  });
+  h+='</div>';
+  document.getElementById('content').innerHTML=h;
+}
+
+// ================================================================
+// ⑧ TOPIC VIEW
+// ================================================================
+function renderTopic(){
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const t=m.topics.find(x=>x.key===S.topicKey);
+  const nC=m.con.filter(x=>x[5]===S.topicKey).length;
+  const nP=m.cas.filter(x=>x[7]===S.topicKey).length;
+  const nOx=m.qui.filter(x=>x[5]===S.topicKey&&x[1]==='OX').length;
+  const nMcq=m.qui.filter(x=>x[5]===S.topicKey&&x[1]==='MCQ').length;
+  const nCase=m.qui.filter(x=>x[5]===S.topicKey&&x[1]==='CASE').length;
+  const nBlank=m.qui.filter(x=>x[5]===S.topicKey&&x[1]==='BLANK').length;
+  const nFlash=m.fla.filter(x=>x[4]===S.topicKey).length;
+  const TABS=[
+    {k:'concept',label:`📖 개념 (${nC})`},
+    {k:'case',   label:`⚖️ 판례 (${nP})`},
+    {k:'ox',     label:`🔘 OX (${nOx})`},
+    {k:'mcq',    label:`📋 객관식 (${nMcq})`},
+    {k:'case_q', label:`📝 사례 (${nCase})`},
+    {k:'blank',  label:`✏️ 빈칸 (${nBlank})`},
+    {k:'flash',  label:`🃏 플래시카드 (${nFlash})`},
+  ];
+  const tabBar=TABS.map(tb=>`<button class="tab-btn ${S.tab===tb.k?'active':''}" data-tab="${tb.k}" onclick="switchTab('${tb.k}')">${tb.label}</button>`).join('');
+  document.getElementById('content').innerHTML=`
+    <div class="topic-title">${t.label}</div>
+    <div class="topic-meta">${m.name} · 개념 ${nC} · 판례 ${nP} · 문제 ${nOx+nMcq+nCase+nBlank}</div>
+    <div class="tabs">${tabBar}</div>
+    <div id="tc"></div>`;
+  renderTC();
+}
+function switchTab(k){
+  S.tab=k;S.qIdx=0;S.qAnswered=null;S.fIdx=0;S.fFlipped=false;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===k));
+  renderTC();
+}
+function renderTC(){
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const tc=document.getElementById('tc');
+  if(!tc)return;
+  if(S.tab==='concept')tc.innerHTML=renderConTab(m);
+  else if(S.tab==='case')tc.innerHTML=renderCaseTab(m);
+  else if(S.tab==='flash')tc.innerHTML=renderFlashTab(m);
+  else tc.innerHTML=renderQuizTab(m,TAB_TYPE[S.tab]||'OX');
+}
+
+// ================================================================
+// ⑨ CONCEPT TAB
+// ================================================================
+function renderConTab(m){
+  const items=m.con.filter(x=>x[5]===S.topicKey);
+  if(!items.length)return empty('📖','개념 정리 준비 중','교과서 아카이빙 후 이 단원의 개념이 표시됩니다.');
+  const IL={3:'★★★ 핵심',2:'★★ 중요',1:'★ 기본'};
+  const IC={3:'b3',2:'b2',1:'b1'};
+  return '<div class="concept-list">'+items.map(c=>`
+    <div class="ccard">
+      <div class="ccard-hdr">
+        <div class="ccard-title">${esc(c[1])}</div>
+        <span class="badge ${IC[c[4]]||'b1'}">${IL[c[4]]||''}</span>
+      </div>
+      <div class="ccard-body">${fmtBody(c[2])}</div>
+      ${c[3]&&c[3].length?`<div class="atags">${c[3].map(a=>`<span class="atag" onclick="searchByAtag('${esc(a)}')">${esc(a)}</span>`).join('')}</div>`:''}
+    </div>`).join('')+'</div>';
+}
+function fmtBody(s){
+  if(!s)return'';
+  return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code style="background:var(--bg2);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12.5px">$1</code>')
+    .replace(/^&gt; (.+)/gm,'<blockquote style="border-left:3px solid var(--primary);padding:7px 12px;margin:6px 0;background:var(--bg2);border-radius:0 5px 5px 0;color:var(--text2)">$1</blockquote>');
+}
+
+// ================================================================
+// ⑩ CASE TAB
+// ================================================================
+function renderCaseTab(m){
+  const all=m.cas.filter(x=>x[7]===S.topicKey);
+  if(!all.length)return empty('⚖️','판례 준비 중','이 단원의 판례가 곧 추가됩니다.');
+  const filtered=S.cFilter==='star3'?all.filter(x=>x[6]>=3):S.cFilter==='star2'?all.filter(x=>x[6]>=2):all;
+  return `
+    <div class="case-filters">
+      <button class="fbtn ${S.cFilter==='all'?'active':''}" onclick="setCF('all')">전체 (${all.length})</button>
+      <button class="fbtn ${S.cFilter==='star3'?'active':''}" onclick="setCF('star3')">★★★ 필수 (${all.filter(x=>x[6]>=3).length})</button>
+      <button class="fbtn ${S.cFilter==='star2'?'active':''}" onclick="setCF('star2')">★★ 이상 (${all.filter(x=>x[6]>=2).length})</button>
+    </div>
+    <div class="case-grid">`+
+    filtered.map(c=>`
+      <div class="pcard">
+        <div class="pcard-hdr">
+          <span class="pcard-no">${esc(c[1])}</span>
+          <span class="pcard-stars">${'★'.repeat(c[6])}${'☆'.repeat(Math.max(0,3-c[6]))}</span>
+        </div>
+        <div class="pcard-issue">${esc(c[2])}</div>
+        <div class="pcard-sec"><div class="pcard-sec-lbl">판시사항</div><div class="pcard-sec-txt">${esc(c[3])}</div></div>
+        ${c[4]?`<div class="pcard-sig">💡 ${esc(c[4])}</div>`:''}
+        ${c[5]&&c[5].length?`<div class="atags">${c[5].map(a=>`<span class="atag" onclick="searchByAtag('${esc(a)}')">${esc(a)}</span>`).join('')}</div>`:''}
+      </div>`).join('')+'</div>';
+}
+function setCF(f){S.cFilter=f;renderTC()}
+
+// ================================================================
+// ⑪ QUIZ ENGINE
+// ================================================================
+function getQList(m,type){
+  const all=m.qui.filter(q=>q[5]===S.topicKey&&q[1]===type);
+  if(S.qFilter==='star')return all.filter(q=>q[2].startsWith('★')||q[2].includes('§★'));
+  if(S.qFilter==='wrong'){
+    const p=getP(S.topicKey);
+    const ng=[...p.ox_ng,...p.mcq_ng,...p.blank_ng];
+    return all.filter(q=>ng.includes(q[0]));
+  }
+  return all;
+}
+function renderQuizTab(m,type){
+  const all=m.qui.filter(q=>q[5]===S.topicKey&&q[1]===type);
+  const labels={OX:'OX 퀴즈',MCQ:'객관식',CASE:'사례문제',BLANK:'빈칸채우기'};
+  if(!all.length)return empty('📝',`${labels[type]} 준비 중`,'이 단원의 문제가 곧 추가됩니다.');
+  const list=getQList(m,type);
+  const p=getP(S.topicKey);
+  const ngAll=[...p.ox_ng,...p.mcq_ng,...p.blank_ng].filter(id=>all.find(q=>q[0]===id));
+  const starAll=all.filter(q=>q[2].startsWith('★')||q[2].includes('§★'));
+  const ctrl=`<div class="qcontrols">
+    <button class="fbtn ${S.qFilter==='all'?'active':''}" onclick="setQF('all','${type}')">전체 (${all.length})</button>
+    ${starAll.length?`<button class="fbtn ${S.qFilter==='star'?'active':''}" onclick="setQF('star','${type}')">⭐ 중요 (${starAll.length})</button>`:''}
+    ${ngAll.length?`<button class="fbtn ${S.qFilter==='wrong'?'active':''}" onclick="setQF('wrong','${type}')">❌ 오답 (${ngAll.length})</button>`:''}
+    <span class="qprogress">${Math.min(S.qIdx+1,list.length||1)} / ${list.length}</span>
+  </div>`;
+  if(!list.length)return ctrl+empty('✅','해당 조건의 문제 없음','다른 필터를 선택해보세요.');
+  const idx=Math.min(S.qIdx,list.length-1);
+  const q=list[idx];
+  let card='';
+  if(type==='OX')card=renderOX(q);
+  else if(type==='MCQ')card=renderMCQ(q);
+  else if(type==='CASE')card=renderCASE(q);
+  else if(type==='BLANK')card=renderBLANK(q);
+  return `<div class="qwrap">${ctrl}${card}
+    <div class="qnav">
+      <button class="nbtn" onclick="prevQ()" ${idx===0?'disabled':''}>← 이전</button>
+      <span style="font-size:11.5px;color:var(--text3)">${idx+1} / ${list.length}</span>
+      <button class="nbtn" onclick="nextQ('${type}')" ${idx>=list.length-1?'disabled':''}>다음 →</button>
+    </div>
+  </div>`;
+}
+
+function renderOX(q){
+  const star=q[2].startsWith('★');
+  let fact='',qtext=q[2];
+  if(q[2].includes('§')){const p=q[2].split('§');fact=`<div class="qfact">${esc(p[0])}</div>`;qtext=p.slice(1).join('§')}
+  const ans=S.qAnswered;
+  const cor=q[3]; // true/false
+  return `<div class="qcard">
+    <div class="qcard-top"><span class="qbadge qb-ox">OX</span>${star?'<span class="qstar">★ 중요</span>':''}</div>
+    ${fact}<div class="qquestion">${esc(qtext.replace(/^★\s*/,''))}</div>
+    <div class="ox-row">
+      <button class="oxbtn obtn ${ans!==null?(cor===true?'ans-ok':(ans===true?'ans-ng':'')):'sel-o'}" onclick="${ans===null?`ansOx(true,${q[3]},'${escA(q[0])}')`:''}">○</button>
+      <button class="oxbtn xbtn ${ans!==null?(cor===false?'ans-ok':(ans===false?'ans-ng':'')):'sel-x'}" onclick="${ans===null?`ansOx(false,${q[3]},'${escA(q[0])}')`:''}">✕</button>
+    </div>
+    ${ans!==null?`<div class="qexp show"><div class="qres ${ans===cor?'ok':'ng'}">${ans===cor?'✓ 정답':'✗ 오답'} · 정답: ${cor?'O':'X'}</div><div>${esc(q[4])}</div></div>`:''}
+  </div>`;
+}
+function ansOx(sel,cor,id){S.qAnswered=sel;recordOx(id,sel===cor);renderTC()}
+
+function renderMCQ(q){
+  const star=q[2].startsWith('★')||q[2].includes('§★');
+  const pts=q[2].split('§');
+  let fact='',qline,opts;
+  // 두 번째 요소가 선지(①로 시작)이면 첫 요소가 질문. 아니면 첫 요소가 사실관계.
+  if(pts.length>1&&pts[1].trim().startsWith('①')){
+    qline=pts[0].replace(/^★\s*/,'');opts=pts.slice(1);
+  } else {
+    fact=pts.length>1?`<div class="qfact">${esc(pts[0])}</div>`:'';
+    qline=(pts[1]||pts[0]).replace(/^★\s*/,'');opts=pts.slice(pts.length>1?2:1);
+  }
+  const SYMS=['①','②','③','④','⑤'];
+  const ans=S.qAnswered;
+  const cor=q[3];
+  const optH=opts.map((o,i)=>{
+    const sym=SYMS[i];
+    let cls='';
+    if(ans!==null){if(sym===cor)cls='m-correct';else if(sym===ans)cls='m-wrong'}
+    return`<div class="mopt ${cls}" onclick="${ans===null?`ansMcq('${sym}','${cor}','${escA(q[0])}')`:''}"><span class="mopt-n">${sym}</span><span>${esc(o.replace(/^[①②③④⑤]\s*/,''))}</span></div>`;
+  }).join('');
+  return `<div class="qcard">
+    <div class="qcard-top"><span class="qbadge qb-mcq">객관식</span>${star?'<span class="qstar">★ 중요</span>':''}</div>
+    ${fact}<div class="qquestion">${esc(qline)}</div>
+    <div class="mcq-opts">${optH}</div>
+    ${ans!==null?`<div class="qexp show"><div class="qres ${ans===cor?'ok':'ng'}">${ans===cor?'✓ 정답':`✗ 오답 · 정답: ${cor}`}</div><div>${esc(q[4])}</div></div>`:''}
+  </div>`;
+}
+function ansMcq(sel,cor,id){S.qAnswered=sel;recordMcq(id,sel===cor);renderTC()}
+
+function renderCASE(q){
+  const pts=q[2].split('§');
+  const fact=pts.length>1?`<div class="case-facts">${esc(pts[0])}</div>`:'';
+  const qtext=pts.length>1?pts.slice(1).join('\n'):pts[0];
+  return `<div class="qcard">
+    <div class="qcard-top"><span class="qbadge qb-case">사례</span></div>
+    ${fact}<div class="case-q">${esc(qtext)}</div>
+    <button class="case-ans-btn" onclick="toggleAns(this)">📋 모범답안 보기</button>
+    <div class="case-ans" id="cans">${esc(q[4])}</div>
+  </div>`;
+}
+function toggleAns(btn){const el=document.getElementById('cans');el.classList.toggle('show');btn.textContent=el.classList.contains('show')?'📋 모범답안 숨기기':'📋 모범답안 보기'}
+
+function renderBLANK(q){
+  const ans=S.qAnswered;
+  return `<div class="qcard">
+    <div class="qcard-top"><span class="qbadge qb-blank">빈칸</span></div>
+    <div class="qquestion">${esc(q[2])}</div>
+    <div class="blank-row">
+      <input class="blank-inp ${ans===null?'':(ans?'ok':'ng')}" id="binp" placeholder="정답 입력 후 Enter..." ${ans!==null?'disabled':''}
+        onkeydown="if(event.key==='Enter')submitBlank('${escA(q[3])}','${escA(q[0])}')">
+      ${ans===null?`<button class="nbtn pri" onclick="submitBlank('${escA(q[3])}','${escA(q[0])}')">확인</button>`:''}
+    </div>
+    ${ans!==null?`<div class="qexp show"><div class="qres ${ans?'ok':'ng'}">${ans?'✓ 정답':`✗ 오답 · 정답: ${esc(q[3])}`}</div><div>${esc(q[4])}</div></div>`:''}
+  </div>`;
+}
+function submitBlank(cor,id){
+  const el=document.getElementById('binp');if(!el)return;
+  const ok=el.value.trim().replace(/\s/g,'')===cor.replace(/\s/g,'');
+  S.qAnswered=ok;recordBlank(id,ok);renderTC();
+}
+
+function setQF(f,type){S.qFilter=f;S.qIdx=0;S.qAnswered=null;renderTC()}
+function prevQ(){if(S.qIdx>0){S.qIdx--;S.qAnswered=null;renderTC()}}
+function nextQ(type){
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const list=getQList(m,type);
+  if(S.qIdx<list.length-1){S.qIdx++;S.qAnswered=null;renderTC()}
+}
+
+// ================================================================
+// ⑫ FLASHCARD TAB
+// ================================================================
+function renderFlashTab(m){
+  const items=m.fla.filter(x=>x[4]===S.topicKey);
+  if(!items.length)return empty('🃏','플래시카드 준비 중','이 단원의 플래시카드가 곧 추가됩니다.');
+  const idx=Math.min(S.fIdx,items.length-1);
+  const c=items[idx];
+  const CL={concept:'개념',case:'판례',article:'조문',compare:'비교'};
+  return `<div class="flash-wrap">
+    <div class="flash-ctr">${idx+1} / ${items.length}</div>
+    <div class="flash-hint">클릭하면 뒤집힙니다 &nbsp;·&nbsp; 스페이스바로도 뒤집기 가능</div>
+    <div class="flash-scene" onclick="flipCard()">
+      <div class="flash-inner ${S.fFlipped?'flipped':''}" id="fi">
+        <div class="flash-face flash-front">
+          <span class="flash-cat">${CL[c[3]]||c[3]}</span>
+          <div class="flash-face-lbl">KEYWORD</div>
+          <div class="flash-front-text">${esc(c[1])}</div>
+        </div>
+        <div class="flash-face flash-back">
+          <span class="flash-cat">${CL[c[3]]||c[3]}</span>
+          <div class="flash-face-lbl">ANSWER</div>
+          <div class="flash-back-text">${esc(c[2])}</div>
+        </div>
+      </div>
+    </div>
+    <div class="qnav">
+      <button class="nbtn" onclick="prevF()" ${idx===0?'disabled':''}>← 이전</button>
+      <button class="nbtn" onclick="shuffleF()">🔀 섞기</button>
+      <button class="nbtn" onclick="nextF()" ${idx>=items.length-1?'disabled':''}>다음 →</button>
+    </div>
+  </div>`;
+}
+function flipCard(){S.fFlipped=!S.fFlipped;const el=document.getElementById('fi');if(el)el.classList.toggle('flipped',S.fFlipped)}
+function prevF(){if(S.fIdx>0){S.fIdx--;S.fFlipped=false;renderTC()}}
+function nextF(){
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const items=m.fla.filter(x=>x[4]===S.topicKey);
+  if(S.fIdx<items.length-1){S.fIdx++;S.fFlipped=false;renderTC()}
+}
+function shuffleF(){
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const items=m.fla.filter(x=>x[4]===S.topicKey);
+  S.fIdx=Math.floor(Math.random()*items.length);S.fFlipped=false;renderTC();
+}
+
+// ================================================================
+// ⑬ SEARCH
+// ================================================================
+function openSearch(){document.getElementById('soverlay').classList.add('show');setTimeout(()=>document.getElementById('sinput').focus(),40)}
+function closeSOverlay(e){if(e.target===document.getElementById('soverlay'))closeSearch()}
+function closeSearch(){document.getElementById('soverlay').classList.remove('show');document.getElementById('sinput').value='';document.getElementById('sresults').innerHTML='<div class="sempty">검색어를 입력하세요</div>'}
+function searchByAtag(a){openSearch();document.getElementById('sinput').value=a;doSearch(a)}
+
+function doSearch(q){
+  q=q.trim();
+  const r=document.getElementById('sresults');
+  if(!q){r.innerHTML='<div class="sempty">검색어를 입력하세요</div>';return}
+  const lq=q.toLowerCase();
+  const res=[];
+  MODULES.forEach(m=>{
+    m.con.forEach(c=>{if((c[1]+c[2]).toLowerCase().includes(lq)||c[3].some(a=>a.includes(q)))res.push({type:'개념',title:c[1],sub:c[3].join(' · '),mk:m.key,tk:c[5]})});
+    m.cas.forEach(c=>{if((c[1]+c[2]+c[3]).toLowerCase().includes(lq)||c[5].some(a=>a.includes(q)))res.push({type:'판례',title:c[2],sub:c[1],mk:m.key,tk:c[7]})});
+    m.qui.forEach(c=>{if(c[2].toLowerCase().includes(lq)){const tl={OX:'OX',MCQ:'객관식',CASE:'사례',BLANK:'빈칸'}[c[1]];res.push({type:tl,title:c[2].replace(/§.*$/,'').replace(/^★\s*/,'').substring(0,55)+'…',sub:'',mk:m.key,tk:c[5]})}});
+  });
+  if(!res.length){r.innerHTML=`<div class="sempty">"${esc(q)}"에 대한 결과 없음</div>`;return}
+  r.innerHTML=res.slice(0,25).map(x=>`<div class="sri" onclick="goTopic('${x.mk}','${x.tk}');closeSearch()"><div class="sri-type">${x.type}</div><div class="sri-title">${esc(x.title)}</div>${x.sub?`<div class="sri-sub">${esc(x.sub)}</div>`:''}</div>`).join('');
+}
+
+// ================================================================
+// ⑭ WRONG NOTE
+// ================================================================
+function showWrongNote(){
+  const ws=allWrong();
+  S.modKey=null;S.topicKey=null;
+  renderBC();renderSB();
+  if(!ws.length){document.getElementById('content').innerHTML=`<div class="hub-title">📕 오답노트</div><div style="margin-top:40px">`+empty('🎉','오답 없음','모든 문제를 맞혔습니다!')+`</div>`;return}
+  let h=`<div class="hub-title">📕 오답노트</div><div class="hub-sub">틀린 문제 ${ws.length}개 · 복습이 필요한 항목</div>`;
+  ws.slice(0,60).forEach(({q,mod})=>{
+    const t=mod.topics.find(x=>x.key===q[5]);
+    h+=`<div class="wn-item">
+      <div class="wn-meta">${{OX:'OX',MCQ:'객관식',CASE:'사례',BLANK:'빈칸'}[q[1]]} · ${mod.name} › ${t?t.label:q[5]}</div>
+      <div class="wn-q">${esc(q[2].replace(/§.*$/,'').replace(/^★\s*/,'').substring(0,100))}</div>
+      <div class="wn-exp">${esc(q[4])}</div>
+    </div>`;
+  });
+  document.getElementById('content').innerHTML=h;
+}
+
+// ================================================================
+// ⑮ THEME
+// ================================================================
+function toggleTheme(){
+  const d=document.documentElement;
+  const now=d.getAttribute('data-theme');
+  const next=now==='dark'?'light':'dark';
+  d.setAttribute('data-theme',next);
+  document.getElementById('theme-btn').textContent=next==='dark'?'☀️':'🌙';
+  localStorage.setItem('lawmj_theme',next);
+}
+
+// ================================================================
+// ⑯ UTILS
+// ================================================================
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function escA(s){return String(s||'').replace(/'/g,"\\'")}
+function empty(ico,ttl,sub){return`<div class="empty"><div class="empty-ico">${ico}</div><div class="empty-ttl">${ttl}</div><div class="empty-sub">${sub}</div></div>`}
+
+// ================================================================
+// ⑰ KEYBOARD SHORTCUTS
+// ================================================================
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeSearch();
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openSearch()}
+  const sOpen=document.getElementById('soverlay').classList.contains('show');
+  if(!sOpen&&S.topicKey){
+    if(e.key==='ArrowRight'){if(S.tab==='flash')nextF();else nextQ(TAB_TYPE[S.tab]||'OX')}
+    if(e.key==='ArrowLeft'){if(S.tab==='flash')prevF();else prevQ()}
+    if(e.key===' '&&S.tab==='flash'){e.preventDefault();flipCard()}
+  }
+});
+
+// ================================================================
+// ⑱ INIT
+// ================================================================
+(function(){
+  loadP();
+  const theme=localStorage.getItem('lawmj_theme')||'light';
+  document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('theme-btn').textContent=theme==='dark'?'☀️':'🌙';
+  renderSB();renderBC();renderHub();
+})();
+</script>
+</body>
+</html>
