@@ -240,6 +240,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .empty-ttl{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:5px}
 .empty-sub{font-size:12.5px}
 
+/* PAGE BADGE */
+.pbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:4px;background:#eef2ff;color:#3b5bdb;font-size:10.5px;font-weight:600;white-space:nowrap;cursor:default;flex-shrink:0}
+[data-theme="dark"] .pbadge{background:#101830;color:#7a9eff}
+.pbadge-lg{font-size:12.5px;padding:4px 11px}
+.sri-page{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:3px;background:#eef2ff;color:#3b5bdb;font-size:10px;font-weight:600;margin-top:3px}
+[data-theme="dark"] .sri-page{background:#101830;color:#7a9eff}
+
 /* WRONG NOTE PAGE */
 .wn-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
 .wn-meta{font-size:10.5px;color:var(--text3);margin-bottom:6px}
@@ -278,7 +285,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="sbox">
     <div class="sinput-row">
       <span style="font-size:16px;color:var(--text3)">🔍</span>
-      <input class="sinput" id="sinput" placeholder="조문번호, 판례, 개념, 키워드 검색... (예: §750, 대판 2003, 불법행위)" oninput="doSearch(this.value)">
+      <input class="sinput" id="sinput" placeholder="조문(§750), 판례번호, 개념, 키워드, 또는 페이지 번호(예: p.145, 200페이지)" oninput="doSearch(this.value)">
       <button class="tbtn" style="border:none" onclick="closeSearch()">✕</button>
     </div>
     <div class="sresults" id="sresults"><div class="sempty">검색어를 입력하세요</div></div>
@@ -293,14 +300,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 // ================================================================
 // ① 데이터 배열 (아카이빙 시 순차적으로 채움)
 // 포맷:
-//  CONCEPT:   [id, title, body, article_refs[], importance(1-3), topic]
-//  CASE:      [id, case_no, issue, holding, significance, article_refs[], stars(1-3), topic]
-//  QUIZ:      [id, type, question, answer, explanation, topic]
+//  CONCEPT:   [id, title, body, article_refs[], importance(1-3), topic, page]
+//  CASE:      [id, case_no, issue, holding, significance, article_refs[], stars(1-3), topic, page]
+//  QUIZ:      [id, type, question, answer, explanation, topic, page]
 //             type → "OX"(answer:true/false) | "MCQ"(answer:"①"~"⑤") | "CASE"(answer:"OPEN") | "BLANK"(answer:string)
 //             MCQ question 형식: "질문§①선지1§②선지2§③선지3§④선지4§⑤선지5"
 //             공통사실 있을 시: "사실관계§질문§①선지1§..."  / OX: "사실관계§★지문"
-//  FLASHCARD: [id, front, back, category, topic]
+//  FLASHCARD: [id, front, back, category, topic, page]
 //             category → "concept"|"case"|"article"|"compare"
+//
+//  page 필드:
+//    단일 페이지 → 숫자:       123
+//    페이지 범위 → 배열:       [123, 125]
+//    페이지 미상 → null 또는 생략
+//  예시: ["총칙_C001","법률행위의 의의","...본문...",["§105","§107"],3,"법률행위",145]
 // ================================================================
 
 const 총칙_CONCEPT = [
@@ -620,7 +633,10 @@ function renderConTab(m){
     <div class="ccard">
       <div class="ccard-hdr">
         <div class="ccard-title">${esc(c[1])}</div>
-        <span class="badge ${IC[c[4]]||'b1'}">${IL[c[4]]||''}</span>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+          ${pageBadge(c[6])}
+          <span class="badge ${IC[c[4]]||'b1'}">${IL[c[4]]||''}</span>
+        </div>
       </div>
       <div class="ccard-body">${fmtBody(c[2])}</div>
       ${c[3]&&c[3].length?`<div class="atags">${c[3].map(a=>`<span class="atag" onclick="searchByAtag('${esc(a)}')">${esc(a)}</span>`).join('')}</div>`:''}
@@ -652,6 +668,8 @@ function renderCaseTab(m){
         <div class="pcard-hdr">
           <span class="pcard-no">${esc(c[1])}</span>
           <span class="pcard-stars">${'★'.repeat(c[6])}${'☆'.repeat(Math.max(0,3-c[6]))}</span>
+          <span style="flex:1"></span>
+          ${pageBadge(c[8])}
         </div>
         <div class="pcard-issue">${esc(c[2])}</div>
         <div class="pcard-sec"><div class="pcard-sec-lbl">판시사항</div><div class="pcard-sec-txt">${esc(c[3])}</div></div>
@@ -712,7 +730,7 @@ function renderOX(q){
   const ans=S.qAnswered;
   const cor=q[3]; // true/false
   return `<div class="qcard">
-    <div class="qcard-top"><span class="qbadge qb-ox">OX</span>${star?'<span class="qstar">★ 중요</span>':''}</div>
+    <div class="qcard-top"><span class="qbadge qb-ox">OX</span>${star?'<span class="qstar">★ 중요</span>':''}<span style="flex:1"></span>${pageBadge(q[6])}</div>
     ${fact}<div class="qquestion">${esc(qtext.replace(/^★\s*/,''))}</div>
     <div class="ox-row">
       <button class="oxbtn obtn ${ans!==null?(cor===true?'ans-ok':(ans===true?'ans-ng':'')):'sel-o'}" onclick="${ans===null?`ansOx(true,${q[3]},'${escA(q[0])}')`:''}">○</button>
@@ -744,7 +762,7 @@ function renderMCQ(q){
     return`<div class="mopt ${cls}" onclick="${ans===null?`ansMcq('${sym}','${cor}','${escA(q[0])}')`:''}"><span class="mopt-n">${sym}</span><span>${esc(o.replace(/^[①②③④⑤]\s*/,''))}</span></div>`;
   }).join('');
   return `<div class="qcard">
-    <div class="qcard-top"><span class="qbadge qb-mcq">객관식</span>${star?'<span class="qstar">★ 중요</span>':''}</div>
+    <div class="qcard-top"><span class="qbadge qb-mcq">객관식</span>${star?'<span class="qstar">★ 중요</span>':''}<span style="flex:1"></span>${pageBadge(q[6])}</div>
     ${fact}<div class="qquestion">${esc(qline)}</div>
     <div class="mcq-opts">${optH}</div>
     ${ans!==null?`<div class="qexp show"><div class="qres ${ans===cor?'ok':'ng'}">${ans===cor?'✓ 정답':`✗ 오답 · 정답: ${cor}`}</div><div>${esc(q[4])}</div></div>`:''}
@@ -757,7 +775,7 @@ function renderCASE(q){
   const fact=pts.length>1?`<div class="case-facts">${esc(pts[0])}</div>`:'';
   const qtext=pts.length>1?pts.slice(1).join('\n'):pts[0];
   return `<div class="qcard">
-    <div class="qcard-top"><span class="qbadge qb-case">사례</span></div>
+    <div class="qcard-top"><span class="qbadge qb-case">사례</span><span style="flex:1"></span>${pageBadge(q[6])}</div>
     ${fact}<div class="case-q">${esc(qtext)}</div>
     <button class="case-ans-btn" onclick="toggleAns(this)">📋 모범답안 보기</button>
     <div class="case-ans" id="cans">${esc(q[4])}</div>
@@ -768,7 +786,7 @@ function toggleAns(btn){const el=document.getElementById('cans');el.classList.to
 function renderBLANK(q){
   const ans=S.qAnswered;
   return `<div class="qcard">
-    <div class="qcard-top"><span class="qbadge qb-blank">빈칸</span></div>
+    <div class="qcard-top"><span class="qbadge qb-blank">빈칸</span><span style="flex:1"></span>${pageBadge(q[6])}</div>
     <div class="qquestion">${esc(q[2])}</div>
     <div class="blank-row">
       <input class="blank-inp ${ans===null?'':(ans?'ok':'ng')}" id="binp" placeholder="정답 입력 후 Enter..." ${ans!==null?'disabled':''}
@@ -852,13 +870,75 @@ function doSearch(q){
   if(!q){r.innerHTML='<div class="sempty">검색어를 입력하세요</div>';return}
   const lq=q.toLowerCase();
   const res=[];
+
+  // ── 페이지 번호 검색 패턴 감지
+  // 지원 형식: "p.145" / "p145" / "pp.123" / "123페이지" / "145p" / 순수 숫자(50 이상)
+  const pgPat=/^(?:pp?\.?\s*|페이지\s*)?(\d{2,4})\s*(?:페이지|p|쪽)?$/i;
+  const pgMatch=q.match(pgPat);
+  const pageTarget=pgMatch?parseInt(pgMatch[1]):null;
+
   MODULES.forEach(m=>{
-    m.con.forEach(c=>{if((c[1]+c[2]).toLowerCase().includes(lq)||c[3].some(a=>a.includes(q)))res.push({type:'개념',title:c[1],sub:c[3].join(' · '),mk:m.key,tk:c[5]})});
-    m.cas.forEach(c=>{if((c[1]+c[2]+c[3]).toLowerCase().includes(lq)||c[5].some(a=>a.includes(q)))res.push({type:'판례',title:c[2],sub:c[1],mk:m.key,tk:c[7]})});
-    m.qui.forEach(c=>{if(c[2].toLowerCase().includes(lq)){const tl={OX:'OX',MCQ:'객관식',CASE:'사례',BLANK:'빈칸'}[c[1]];res.push({type:tl,title:c[2].replace(/§.*$/,'').replace(/^★\s*/,'').substring(0,55)+'…',sub:'',mk:m.key,tk:c[5]})}});
+    // ── CONCEPT 검색
+    m.con.forEach(c=>{
+      const hit=
+        (c[1]+c[2]).toLowerCase().includes(lq)||
+        c[3].some(a=>a.replace(/[§\s]/g,'').includes(q.replace(/[§\s]/g,'')))||
+        (pageTarget!==null&&pageInRange(c[6],pageTarget));
+      if(hit)res.push({type:'개념',title:c[1],sub:c[3].join(' · ')||'',mk:m.key,tk:c[5],page:c[6],mod:m.name});
+    });
+    // ── CASE 검색 (사건번호, 쟁점, 판시, 조문, 페이지)
+    m.cas.forEach(c=>{
+      const hit=
+        (c[1]+c[2]+c[3]).toLowerCase().includes(lq)||
+        c[5].some(a=>a.replace(/[§\s]/g,'').includes(q.replace(/[§\s]/g,'')))||
+        (pageTarget!==null&&pageInRange(c[8],pageTarget));
+      if(hit)res.push({type:'판례',title:c[2],sub:c[1],mk:m.key,tk:c[7],page:c[8],stars:c[6],mod:m.name});
+    });
+    // ── QUIZ 검색 (문제 본문, 페이지)
+    m.qui.forEach(c=>{
+      const hit=
+        c[2].toLowerCase().includes(lq)||c[4].toLowerCase().includes(lq)||
+        (pageTarget!==null&&pageInRange(c[6],pageTarget));
+      if(hit){
+        const tl={OX:'OX',MCQ:'객관식',CASE:'사례',BLANK:'빈칸'}[c[1]]||c[1];
+        const titleRaw=c[2].replace(/§.*$/,'').replace(/^★\s*/,'');
+        res.push({type:tl,title:titleRaw.length>60?titleRaw.substring(0,60)+'…':titleRaw,sub:'',mk:m.key,tk:c[5],page:c[6],mod:m.name});
+      }
+    });
   });
-  if(!res.length){r.innerHTML=`<div class="sempty">"${esc(q)}"에 대한 결과 없음</div>`;return}
-  r.innerHTML=res.slice(0,25).map(x=>`<div class="sri" onclick="goTopic('${x.mk}','${x.tk}');closeSearch()"><div class="sri-type">${x.type}</div><div class="sri-title">${esc(x.title)}</div>${x.sub?`<div class="sri-sub">${esc(x.sub)}</div>`:''}</div>`).join('');
+
+  if(!res.length){
+    const hint=pageTarget?`교과서 ${pageTarget}페이지 근처 내용이 없습니다. 아직 아카이빙되지 않은 범위일 수 있습니다.`:`"${esc(q)}"에 대한 결과 없음`;
+    r.innerHTML=`<div class="sempty">${hint}</div>`;
+    return;
+  }
+
+  // 페이지 검색이면 페이지 오름차순 정렬, 아니면 판례 > 개념 > 문제 순
+  if(pageTarget){
+    res.sort((a,b)=>{
+      const pa=a.page==null?9999:(Array.isArray(a.page)?a.page[0]:a.page);
+      const pb=b.page==null?9999:(Array.isArray(b.page)?b.page[0]:b.page);
+      return pa-pb;
+    });
+  }
+
+  const typeIcon={개념:'📖',판례:'⚖️',OX:'🔘',객관식:'📋',사례:'📝',빈칸:'✏️'};
+  r.innerHTML=res.slice(0,30).map(x=>{
+    const pt=pageText(x.page);
+    const starsHtml=x.stars?`<span style="color:var(--star);font-size:10px">${'★'.repeat(x.stars)}</span>`:'';
+    return`<div class="sri" onclick="goTopic('${x.mk}','${x.tk}');closeSearch()">
+      <div class="sri-type">${typeIcon[x.type]||''} ${x.type} &nbsp;·&nbsp; ${x.mod}</div>
+      <div class="sri-title">${esc(x.title)} ${starsHtml}</div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap">
+        ${x.sub?`<span class="sri-sub">${esc(x.sub)}</span>`:''}
+        ${pt?`<span class="sri-page">📄 ${pt}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  if(res.length>30){
+    r.innerHTML+=`<div class="sempty" style="font-size:11px;padding:10px">외 ${res.length-30}건 더 있음 — 검색어를 더 구체적으로 입력하세요</div>`;
+  }
 }
 
 // ================================================================
@@ -899,6 +979,23 @@ function toggleTheme(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function escA(s){return String(s||'').replace(/'/g,"\\'")}
 function empty(ico,ttl,sub){return`<div class="empty"><div class="empty-ico">${ico}</div><div class="empty-ttl">${ttl}</div><div class="empty-sub">${sub}</div></div>`}
+
+// page: 숫자(123) 또는 배열([123,125]) 또는 null
+function pageText(p){
+  if(p==null||p===undefined)return null;
+  return Array.isArray(p)?`pp.${p[0]}–${p[1]}`:`p.${p}`;
+}
+function pageBadge(p,lg){
+  const t=pageText(p);
+  if(!t)return'';
+  return`<span class="pbadge${lg?' pbadge-lg':''}" title="교과서 ${t}">📄 ${t}</span>`;
+}
+// 페이지 범위 포함 여부: 검색 target 페이지가 항목의 page 범위 내에 있는지
+function pageInRange(itemPage, target){
+  if(itemPage==null||itemPage===undefined)return false;
+  if(Array.isArray(itemPage))return target>=itemPage[0]&&target<=itemPage[1];
+  return Math.abs(itemPage-target)<=2; // ±2 페이지 허용
+}
 
 // ================================================================
 // ⑰ KEYBOARD SHORTCUTS
