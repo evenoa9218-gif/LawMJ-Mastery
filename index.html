@@ -275,6 +275,40 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pbadge{cursor:pointer!important}
 .pbadge:hover{opacity:0.78}
 
+/* ── 목차 맵 페이지 ── */
+.dday-chip{padding:3px 11px;background:#fff0f0;color:#e03131;border-radius:6px;font-size:13px;font-weight:700;font-family:'Noto Serif KR',serif;white-space:nowrap;flex-shrink:0;letter-spacing:-0.5px}
+[data-theme="dark"] .dday-chip{background:#3a0e0e;color:#ff8080}
+.map-top{margin-bottom:18px}
+.map-dday-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.map-dday-big{font-family:'Noto Serif KR',serif;font-size:36px;font-weight:700;color:#e03131;letter-spacing:-2px;line-height:1}
+[data-theme="dark"] .map-dday-big{color:#ff7070}
+.map-dday-info{font-size:12.5px;color:var(--text2)}
+.map-dday-exam{font-weight:700;color:var(--text)}
+.map-title{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;margin-bottom:3px}
+.map-sub{font-size:12px;color:var(--text3);margin-bottom:18px}
+.map-search-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.map-sinp{flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.15s}
+.map-sinp:focus{border-color:var(--primary)}
+.map-filters{display:flex;gap:5px;flex-wrap:wrap}
+.map-part-hdr{display:flex;align-items:center;gap:8px;margin:22px 0 10px;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.6px;text-transform:uppercase}
+.map-part-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
+.map-part-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.mcard2{background:var(--card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:10px;padding:13px 15px;cursor:pointer;transition:all 0.18s}
+.mcard2:hover{border-color:var(--primary);border-left-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-1px)}
+.mcard2-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:5px;line-height:1.4}
+.mcard2-counts{margin-left:auto;font-size:9.5px;color:var(--text3);font-weight:400;white-space:nowrap;flex-shrink:0}
+.map-pbar{height:3px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-bottom:7px}
+.map-pbar-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.map-tags{display:flex;flex-wrap:wrap;gap:4px}
+.mtag{padding:2px 8px;border-radius:4px;font-size:10.5px;cursor:pointer;transition:all 0.13s;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.mtag.has{background:var(--primary-light);color:var(--primary)}
+.mtag.has:hover{opacity:0.8}
+.mtag.empty{background:var(--bg2);color:var(--text3);font-style:italic;cursor:default}
+.map-examdate-row{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11.5px;color:var(--text3)}
+.map-examdate-inp{padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text);font-size:11.5px;outline:none;width:110px}
+.map-examdate-inp:focus{border-color:var(--primary)}
+
 @media(max-width:780px){
   .sidebar{width:220px;min-width:220px;position:fixed;z-index:90;transform:translateX(-100%);transition:transform 0.28s}
   .sidebar.open{transform:translateX(0)}
@@ -286,7 +320,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <body>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sb-logo">
+  <div class="sb-logo" onclick="goMap()" style="cursor:pointer">
     <div class="sb-logo-title">⚖️ LawMJ Mastery</div>
     <div class="sb-logo-sub">민법 교과서 완전학습 플랫폼</div>
   </div>
@@ -297,6 +331,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <div class="main-wrap">
   <div class="topbar">
     <div class="breadcrumb" id="breadcrumb"></div>
+    <span class="dday-chip" id="dday-chip" onclick="goMap()" title="변호사시험 D-day · 클릭하면 목차로" style="cursor:pointer">D-...</span>
+    <button class="tbtn" onclick="goMap()" title="목차 맵">🗺️</button>
     <button class="tbtn" onclick="openSearch()" title="검색 (⌘K)">🔍</button>
     <button class="tbtn" onclick="toggleTheme()" id="theme-btn" title="테마 전환">🌙</button>
   </div>
@@ -470,39 +506,6 @@ const 친족상속_FLASHCARD = [
 // ================================================================
 const MODULES = [
   {
-    key:'총칙', name:'민법총칙', icon:'📜', color:'#3b5bdb',
-    con:총칙_CONCEPT, cas:총칙_CASE, qui:총칙_QUIZ, fla:총칙_FLASHCARD,
-    topics:[
-      {key:'법원총칙서론',   label:'민법의 의의·법원·해석'},
-      {key:'권리주체자연인', label:'자연인 (능력·주소·부재·실종)'},
-      {key:'권리주체법인',   label:'법인'},
-      {key:'권리객체',       label:'물건'},
-      {key:'법률행위',       label:'법률행위 총론'},
-      {key:'의사표시',       label:'의사표시'},
-      {key:'대리',           label:'대리'},
-      {key:'무효취소',       label:'무효와 취소'},
-      {key:'조건기한',       label:'조건·기한'},
-      {key:'기간',           label:'기간'},
-      {key:'소멸시효',       label:'소멸시효'},
-    ]
-  },
-  {
-    key:'물권', name:'물권법', icon:'🏛️', color:'#0ca678',
-    con:물권_CONCEPT, cas:물권_CASE, qui:물권_QUIZ, fla:물권_FLASHCARD,
-    topics:[
-      {key:'물권총론', label:'물권 총론'},
-      {key:'물권변동', label:'물권변동'},
-      {key:'점유권',   label:'점유권'},
-      {key:'소유권',   label:'소유권'},
-      {key:'지상권',   label:'지상권'},
-      {key:'지역권',   label:'지역권'},
-      {key:'전세권',   label:'전세권'},
-      {key:'유치권',   label:'유치권'},
-      {key:'질권',     label:'질권'},
-      {key:'저당권',   label:'저당권'},
-    ]
-  },
-  {
     key:'채권총론', name:'채권총론', icon:'🤝', color:'#e8590c',
     con:채권총론_CONCEPT, cas:채권총론_CASE, qui:채권총론_QUIZ, fla:채권총론_FLASHCARD,
     topics:[
@@ -537,9 +540,41 @@ const MODULES = [
       {key:'불법행위',   label:'불법행위 (일반·특수)'},
     ]
   },
-  // ※ 친족·상속 파트는 이 교재(로스쿨 민법의 정석)에 없음
+  {
+    key:'총칙', name:'민법총칙', icon:'📜', color:'#3b5bdb',
+    con:총칙_CONCEPT, cas:총칙_CASE, qui:총칙_QUIZ, fla:총칙_FLASHCARD,
+    topics:[
+      {key:'법원총칙서론',   label:'민법의 의의·법원·해석'},
+      {key:'권리주체자연인', label:'자연인 (능력·주소·부재·실종)'},
+      {key:'권리주체법인',   label:'법인'},
+      {key:'권리객체',       label:'물건'},
+      {key:'법률행위',       label:'법률행위 총론'},
+      {key:'의사표시',       label:'의사표시'},
+      {key:'대리',           label:'대리'},
+      {key:'무효취소',       label:'무효와 취소'},
+      {key:'조건기한',       label:'조건·기한'},
+      {key:'기간',           label:'기간'},
+      {key:'소멸시효',       label:'소멸시효'},
+    ]
+  },
+  {
+    key:'물권', name:'물권법', icon:'🏛️', color:'#0ca678',
+    con:물권_CONCEPT, cas:물권_CASE, qui:물권_QUIZ, fla:물권_FLASHCARD,
+    topics:[
+      {key:'물권총론', label:'물권 총론'},
+      {key:'물권변동', label:'물권변동'},
+      {key:'점유권',   label:'점유권'},
+      {key:'소유권',   label:'소유권'},
+      {key:'지상권',   label:'지상권'},
+      {key:'지역권',   label:'지역권'},
+      {key:'전세권',   label:'전세권'},
+      {key:'유치권',   label:'유치권'},
+      {key:'질권',     label:'질권'},
+      {key:'저당권',   label:'저당권'},
+    ]
+  },
+  // 친족·상속 파트는 이 교재(로스쿨 민법의 정석)에 없음
 ];
-
 const TAB_TYPE = {ox:'OX', mcq:'MCQ', case_q:'CASE', blank:'BLANK'};
 
 // ================================================================
@@ -550,7 +585,7 @@ let S = {
   qIdx:0, qFilter:'all', qAnswered:null,
   fIdx:0, fFlipped:false,
   cFilter:'all',
-  openMods:{'총칙':true},
+  openMods:{'채권총론':true},
 };
 
 // ================================================================
@@ -1278,6 +1313,148 @@ document.addEventListener('keydown',e=>{
 });
 
 // ================================================================
+// 목차 맵 + D-day
+// ================================================================
+const EXAM_DATE_KEY = 'lawmj_examdate';
+const DEFAULT_EXAM  = '2027-01-12'; // 제16회 변호사시험
+let mapFilter = 'all';
+
+function calcDday(dateStr) {
+  const exam = new Date(dateStr || localStorage.getItem(EXAM_DATE_KEY) || DEFAULT_EXAM);
+  const today = new Date(); today.setHours(0,0,0,0); exam.setHours(0,0,0,0);
+  return Math.ceil((exam - today) / (1000*60*60*24));
+}
+function updateDdayChip() {
+  const d = calcDday();
+  const el = document.getElementById('dday-chip');
+  if(!el) return;
+  el.textContent = d > 0 ? `D-${d}` : d === 0 ? 'D-Day' : `D+${Math.abs(d)}`;
+}
+
+function goMap() {
+  S.modKey=null; S.topicKey=null;
+  renderSB(); renderBC('map');
+  renderMap();
+}
+
+function renderMap() {
+  const d = calcDday();
+  const examDateVal = localStorage.getItem(EXAM_DATE_KEY) || DEFAULT_EXAM;
+  const examDate = new Date(examDateVal);
+  const examStr = `${examDate.getFullYear()}.${String(examDate.getMonth()+1).padStart(2,'0')}.${String(examDate.getDate()).padStart(2,'0')}`;
+
+  let html = `
+    <div class="map-top">
+      <div class="map-dday-row">
+        <span class="map-dday-big">${d>0?'D-'+d:d===0?'D-Day':'D+'+ Math.abs(d)}</span>
+        <div>
+          <div class="map-dday-exam">변호사시험 ${examStr}</div>
+          <div class="map-dday-info">로스쿨 민법의 정석 9판 · 채권총론 → 채권각론 → 민법총칙 → 물권법</div>
+        </div>
+      </div>
+      <div class="map-examdate-row">
+        시험 날짜 변경:
+        <input class="map-examdate-inp" type="date" value="${examDateVal}"
+          onchange="localStorage.setItem('${EXAM_DATE_KEY}',this.value);updateDdayChip();renderMap()">
+      </div>
+    </div>
+    <div class="map-search-row">
+      <input class="map-sinp" id="map-sinp" placeholder="쟁점·조문 검색 (예: 상계, 366, 포현대리)" oninput="mapSearch(this.value)">
+      <div class="map-filters">
+        <button class="fbtn ${mapFilter==='all'?'active':''}" onclick="setMapFilter('all')">전체</button>
+        <button class="fbtn ${mapFilter==='star'?'active':''}" onclick="setMapFilter('star')">★ 약점</button>
+        <button class="fbtn ${mapFilter==='done'?'active':''}" onclick="setMapFilter('done')">✓ 완료</button>
+        <button class="fbtn ${mapFilter==='none'?'active':''}" onclick="setMapFilter('none')">미학습</button>
+      </div>
+    </div>
+    <div id="map-body">`;
+
+  MODULES.forEach((mod, mi) => {
+    html += `
+      <div class="map-part-hdr">
+        <span class="map-part-dot" style="background:${mod.color}"></span>
+        Part ${mi+1} · ${mod.name}
+      </div>
+      <div class="map-grid">`;
+
+    mod.topics.forEach(t => {
+      const cons  = mod.con.filter(c => c[5]===t.key);
+      const cases = mod.cas.filter(c => c[7]===t.key);
+      const quizs = mod.qui.filter(q => q[5]===t.key);
+      const pct   = topicPct(mod, t.key);
+      const total = cons.length + cases.length + quizs.length;
+
+      // 필터 적용
+      if(mapFilter==='none' && total>0) return;
+      if(mapFilter==='done' && pct<100) return;
+      if(mapFilter==='star') {
+        const p=getP(t.key);
+        const hasWrong=[...p.ox_ng,...p.mcq_ng,...p.blank_ng].some(id=>quizs.find(q=>q[0]===id));
+        if(!hasWrong) return;
+      }
+
+      // 태그: CONCEPT 제목들 → 짧게 표시
+      const tagHtml = cons.length > 0
+        ? cons.map(c => {
+            const lbl = c[1].replace(/\[.*?\]/g,'').replace(/〈.*?〉/g,'').replace(/—.*/,'').replace(/\(.*?\)/g,'').trim().substring(0,18);
+            return `<span class="mtag has" onclick="event.stopPropagation();goTopic('${mod.key}','${t.key}')" title="${esc(c[1])}">${esc(lbl)}</span>`;
+          }).join('')
+        : `<span class="mtag empty">아카이빙 예정</span>`;
+
+      const borderColor = total > 0 ? mod.color : 'var(--border)';
+      html += `
+        <div class="mcard2" style="border-left-color:${borderColor}" onclick="goTopic('${mod.key}','${t.key}')">
+          <div class="mcard2-title">
+            ${esc(t.label)}
+            <span class="mcard2-counts">개념${cons.length}·판례${cases.length}·문제${quizs.length}</span>
+          </div>
+          ${pct>0?`<div class="map-pbar"><div class="map-pbar-fill" style="width:${pct}%;background:${mod.color}"></div></div>`:''}
+          <div class="map-tags">${tagHtml}</div>
+        </div>`;
+    });
+    html += '</div>';
+  });
+
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function setMapFilter(f) {
+  mapFilter = f;
+  renderMap();
+}
+
+function mapSearch(q) {
+  q = q.trim().toLowerCase();
+  if(!q) { renderMap(); return; }
+  // 맵에서 검색: 매칭 카드만 하이라이트 (간단 구현 — 전체 검색창과 별개)
+  document.querySelectorAll('.mcard2').forEach(card => {
+    const txt = card.textContent.toLowerCase();
+    card.style.opacity = txt.includes(q) ? '1' : '0.25';
+  });
+}
+
+// breadcrumb에 맵 상태 추가
+function renderBC(mode) {
+  const bc = document.getElementById('breadcrumb');
+  if(mode==='map'||(!S.modKey&&!S.topicKey)) {
+    bc.innerHTML='<span class="bc-link" onclick="goMap()">🗺️ 목차</span>';
+    return;
+  }
+  if(!S.modKey) {
+    bc.innerHTML='<span class="bc-link" onclick="goMap()">🗺️ 목차</span>';
+    return;
+  }
+  const m=MODULES.find(x=>x.key===S.modKey);
+  const t=m&&m.topics.find(x=>x.key===S.topicKey);
+  bc.innerHTML=`
+    <span class="bc-link" onclick="goMap()">🗺️ 목차</span>
+    <span class="bc-sep">›</span>
+    <span class="bc-link" onclick="goTopic('${m.key}','${m.topics[0].key}')">${m.name}</span>
+    ${t?`<span class="bc-sep">›</span><strong>${t.label}</strong>`:''}`;
+}
+
+// ================================================================
 // ⑱ INIT
 // ================================================================
 (function(){
@@ -1285,8 +1462,9 @@ document.addEventListener('keydown',e=>{
   const theme=localStorage.getItem('lawmj_theme')||'light';
   document.documentElement.setAttribute('data-theme',theme);
   document.getElementById('theme-btn').textContent=theme==='dark'?'☀️':'🌙';
-  renderSB();renderBC();renderHub();
-  pgInit(); // PDF IndexedDB 자동 로드
+  updateDdayChip();
+  renderSB(); renderBC('map'); renderMap();
+  pgInit();
 })();
 </script>
 </body>
