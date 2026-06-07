@@ -8,20 +8,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#f5f4ef; --bg2:#eceae4; --card:#ffffff; --border:#dddbd5;
-  --text:#1a1a2e; --text2:#4a4a6a; --text3:#9090a8;
-  --primary:#3b5bdb; --primary-light:#e8ecff;
-  --accent:#e03131; --success:#2f9e44; --warning:#f59f00; --star:#f59f00;
-  --sb-bg:#1b2445; --sb-text:#bbc8e8; --sb-active:#4a6cf7; --sb-hover:#232f58;
-  --topbar:#ffffff; --shadow:0 2px 10px rgba(0,0,0,0.07); --radius:10px;
+  /* ── Backgrounds — Linen + Cloud Dancer ── */
+  --bg:#f3f1ee;          /* warm linen */
+  --bg2:#e8ecee;         /* cloud dancer */
+  --card:#ffffff;
+  --border:#cdd8de;      /* powder blue border */
+  /* ── Text — Deep Slate ── */
+  --text:#243237;        /* deep slate (#243237) */
+  --text2:#4e6e7a;       /* steel text */
+  --text3:#90b0ba;       /* mist */
+  /* ── Primary — Steel Blue ── */
+  --primary:#5a8fa0;     /* between #7296a4 & #67869a */
+  --primary-light:#e0edf1;
+  /* ── Semantic ── */
+  --accent:#a07070;      /* dusty rose (for wrong/error) */
+  --success:#5a8c7a;     /* sage (for correct) */
+  --warning:#9a8060;     /* warm sand */
+  --star:#9a8060;        /* star = warm caramel */
+  /* ── Sidebar — Deep Slate ── */
+  --sb-bg:#1c2b34;       /* #243237 darker */
+  --sb-text:#9ebecb;     /* sea glass */
+  --sb-active:#6fa0b5;   /* steel blue active */
+  --sb-hover:#243542;
+  --topbar:#ffffff;
+  --shadow:0 2px 12px rgba(90,143,160,0.10);
+  --radius:10px;
 }
 [data-theme="dark"] {
-  --bg:#0d0f1a; --bg2:#13162a; --card:#1a1d30; --border:#252840;
-  --text:#e8e6f0; --text2:#a0a0c0; --text3:#606080;
-  --primary:#6b8cff; --primary-light:#1a2060;
-  --accent:#ff6b6b; --success:#51cf66; --warning:#fcc419; --star:#fcc419;
-  --sb-bg:#0b0e1e; --sb-text:#8898bb; --sb-active:#3d5bd9; --sb-hover:#141828;
-  --topbar:#13162a; --shadow:0 2px 10px rgba(0,0,0,0.3);
+  --bg:#1b2830;
+  --bg2:#21303a;
+  --card:#273542;
+  --border:#324858;
+  --text:#d5e5ea;
+  --text2:#7aacb8;
+  --text3:#3d6878;
+  --primary:#78b5ca;
+  --primary-light:#1a3545;
+  --accent:#d09090;
+  --success:#6db89e;
+  --warning:#c8a878;
+  --star:#c8a878;
+  --sb-bg:#141e25;
+  --sb-text:#6a9aaa;
+  --sb-active:#78b0c5;
+  --sb-hover:#1b2830;
+  --topbar:#1f2e38;
+  --shadow:0 2px 12px rgba(0,0,0,0.35);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
@@ -29,7 +61,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* SIDEBAR */
 .sidebar{width:252px;min-width:252px;background:var(--sb-bg);display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden;flex-shrink:0}
 .sidebar::-webkit-scrollbar{width:3px}
-.sidebar::-webkit-scrollbar-thumb{background:#2a3a62;border-radius:3px}
+.sidebar::-webkit-scrollbar-thumb{background:#2c4552;border-radius:3px}
 .sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.06)}
 .sb-logo-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.5px}
 .sb-logo-sub{font-size:10px;color:#5a6a8a;margin-top:3px}
@@ -40,7 +72,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .sb-topics{}
 .sb-topic{display:flex;align-items:center;gap:7px;padding:7px 16px 7px 26px;cursor:pointer;color:#7080a0;font-size:12px;transition:all 0.15s;border-left:2px solid transparent}
 .sb-topic:hover{background:var(--sb-hover);color:#bbc8e8}
-.sb-topic.active{background:rgba(74,108,247,0.12);color:#7a9eff;border-left-color:var(--sb-active)}
+.sb-topic.active{background:rgba(90,143,160,0.12);color:#9ebecb;border-left-color:var(--sb-active)}
 .sb-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.5;flex-shrink:0}
 .sb-topic.active .sb-dot{opacity:1;background:var(--sb-active)}
 .sb-pct{margin-left:auto;font-size:10px;opacity:0.5}
@@ -71,11 +103,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .mcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
 .mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.mcard:nth-child(1)::before{background:#3b5bdb}
-.mcard:nth-child(2)::before{background:#0ca678}
-.mcard:nth-child(3)::before{background:#e8590c}
-.mcard:nth-child(4)::before{background:#9c36b5}
-.mcard:nth-child(5)::before{background:#1971c2}
+.mcard:nth-child(1)::before{background:#5a8fa0}
+.mcard:nth-child(2)::before{background:#7aa8b8}
+.mcard:nth-child(3)::before{background:#86b4ae}
+.mcard:nth-child(4)::before{background:#6888a0}
+.mcard:nth-child(5)::before{background:#8098b0}
 .mcard:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--primary)}
 .mcard-icon{font-size:26px;margin-bottom:8px}
 .mcard-name{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin-bottom:4px}
@@ -102,12 +134,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .ccard-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px}
 .ccard-title{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700}
 .badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
-.b3{background:#fff0f0;color:#e03131}
-.b2{background:#fff8e0;color:#e67700}
-.b1{background:#e8ecff;color:#3b5bdb}
-[data-theme="dark"] .b3{background:#3a0e0e;color:#ff8080}
-[data-theme="dark"] .b2{background:#2e1e00;color:#fcc419}
-[data-theme="dark"] .b1{background:#0e1640;color:#6b8cff}
+.b3{background:#f0e3e3;color:#905050}
+.b2{background:#ede9e0;color:#9a7050}
+.b1{background:#e0edf1;color:#4a8090}
+[data-theme="dark"] .b3{background:#3a1818;color:#d09090}
+[data-theme="dark"] .b2{background:#302510;color:#c8a870}
+[data-theme="dark"] .b1{background:#1a3545;color:#7eb5ca}
 .ccard-body{font-size:13.5px;line-height:1.9;color:var(--text2);white-space:pre-wrap}
 .atags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
 .atag{padding:2px 9px;background:var(--primary-light);color:var(--primary);border-radius:4px;font-size:10.5px;font-weight:600;cursor:pointer}
@@ -128,7 +160,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pcard-sec{margin-bottom:7px}
 .pcard-sec-lbl{font-size:9.5px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
 .pcard-sec-txt{font-size:13px;line-height:1.75;color:var(--text2)}
-.pcard-sig{margin-top:9px;padding:7px 11px;background:var(--primary-light);border-radius:6px;font-size:12px;color:var(--primary)}
+.pcard-sig{margin-top:9px;padding:7px 11px;background:#e8f2f5;border-radius:6px;font-size:12px;color:#4a8090;border-left:2px solid var(--primary)}
 
 /* QUIZ */
 .qcontrols{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
@@ -137,14 +169,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .qcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 26px;min-height:180px;margin-bottom:14px}
 .qcard-top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .qbadge{padding:2px 9px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.3px}
-.qb-ox{background:#e8ecff;color:#3b5bdb}
-.qb-mcq{background:#fff0f6;color:#c2255c}
-.qb-case{background:#e6fcf5;color:#0ca678}
-.qb-blank{background:#fff8e0;color:#e67700}
-[data-theme="dark"] .qb-ox{background:#0e1640;color:#6b8cff}
-[data-theme="dark"] .qb-mcq{background:#280a18;color:#f06595}
-[data-theme="dark"] .qb-case{background:#061e18;color:#38d9a9}
-[data-theme="dark"] .qb-blank{background:#281800;color:#fcc419}
+.qb-ox{background:#e0edf1;color:#4a8090}
+.qb-mcq{background:#f0e8ea;color:#9a6070}
+.qb-case{background:#e0eeea;color:#4a8070}
+.qb-blank{background:#ede9e0;color:#8a7050}
+[data-theme="dark"] .qb-ox{background:#1a3545;color:#7eb5ca}
+[data-theme="dark"] .qb-mcq{background:#381525;color:#d08090}
+[data-theme="dark"] .qb-case{background:#153528;color:#7eb5a0}
+[data-theme="dark"] .qb-blank{background:#302510;color:#c8a870}
 .qstar{color:var(--star);font-size:13px}
 .qfact{background:var(--bg2);border-left:3px solid var(--primary);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;line-height:1.8;color:var(--text2);margin-bottom:14px}
 .qquestion{font-size:14.5px;line-height:1.85;color:var(--text);margin-bottom:18px}
@@ -153,25 +185,25 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .ox-row{display:flex;gap:14px;justify-content:center;margin:4px 0}
 .oxbtn{width:76px;height:76px;border-radius:50%;border:2px solid var(--border);background:var(--card);font-size:28px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .oxbtn:hover{transform:scale(1.07)}
-.obtn:hover,.obtn.sel-o{border-color:var(--success);background:rgba(47,158,68,0.09)}
-.xbtn:hover,.xbtn.sel-x{border-color:var(--accent);background:rgba(224,49,49,0.09)}
-.oxbtn.ans-ok{border-color:var(--success)!important;background:rgba(47,158,68,0.13)!important}
-.oxbtn.ans-ng{border-color:var(--accent)!important;background:rgba(224,49,49,0.13)!important}
+.obtn:hover,.obtn.sel-o{border-color:var(--success);background:rgba(90,140,122,0.09)}
+.xbtn:hover,.xbtn.sel-x{border-color:var(--accent);background:rgba(160,112,112,0.09)}
+.oxbtn.ans-ok{border-color:var(--success)!important;background:rgba(90,140,122,0.13)!important}
+.oxbtn.ans-ng{border-color:var(--accent)!important;background:rgba(160,112,112,0.13)!important}
 
 /* MCQ */
 .mcq-opts{display:flex;flex-direction:column;gap:7px}
 .mopt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;font-size:13.5px;line-height:1.7;color:var(--text2);background:var(--card);transition:all 0.15s}
 .mopt:hover{border-color:var(--primary);color:var(--text);background:var(--primary-light)}
-.mopt.m-correct{border-color:var(--success);background:rgba(47,158,68,0.08);color:var(--text)}
-.mopt.m-wrong{border-color:var(--accent);background:rgba(224,49,49,0.08);color:var(--text)}
+.mopt.m-correct{border-color:var(--success);background:rgba(90,140,122,0.08);color:var(--text)}
+.mopt.m-wrong{border-color:var(--accent);background:rgba(160,112,112,0.08);color:var(--text)}
 .mopt-n{font-weight:700;color:var(--primary);flex-shrink:0;width:18px}
 
 /* Explanation */
 .qexp{margin-top:12px;padding:12px 14px;background:var(--bg2);border-radius:7px;border-left:3px solid var(--primary);font-size:13px;line-height:1.8;color:var(--text2);display:none}
 .qexp.show{display:block}
 .qres{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:4px;font-size:11.5px;font-weight:700;margin-bottom:7px}
-.qres.ok{background:rgba(47,158,68,0.13);color:var(--success)}
-.qres.ng{background:rgba(224,49,49,0.13);color:var(--accent)}
+.qres.ok{background:rgba(90,140,122,0.13);color:var(--success)}
+.qres.ng{background:rgba(160,112,112,0.13);color:var(--accent)}
 
 /* BLANK */
 .blank-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -183,9 +215,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* CASE PROB */
 .case-facts{background:var(--bg2);border-left:3px solid #0ca678;padding:12px 15px;border-radius:0 7px 7px 0;margin-bottom:12px;font-size:13.5px;line-height:1.8;color:var(--text2)}
 .case-q{font-size:14.5px;font-weight:600;color:var(--text);margin-bottom:14px}
-.case-ans-btn{padding:9px 18px;border:1.5px solid #0ca678;border-radius:7px;background:transparent;color:#0ca678;font-size:12.5px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all 0.15s}
-.case-ans-btn:hover{background:rgba(12,166,120,0.09)}
-.case-ans{margin-top:12px;padding:14px 16px;background:rgba(12,166,120,0.06);border:1px solid rgba(12,166,120,0.25);border-radius:7px;font-size:13.5px;line-height:1.85;color:var(--text2);display:none}
+.case-ans-btn{padding:9px 18px;border:1.5px solid var(--success);border-radius:7px;background:transparent;color:var(--success);font-size:12.5px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all 0.15s}
+.case-ans-btn:hover{background:rgba(90,140,122,0.09)}
+.case-ans{margin-top:12px;padding:14px 16px;background:rgba(90,140,122,0.07);border:1px solid rgba(90,140,122,0.25);border-radius:7px;font-size:13.5px;line-height:1.85;color:var(--text2);display:none}
 .case-ans.show{display:block}
 
 /* NAV */
@@ -205,8 +237,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .flash-inner.flipped{transform:rotateY(180deg)}
 .flash-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;border:1px solid var(--border);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .flash-front{background:var(--card)}
-.flash-back{background:var(--primary);transform:rotateY(180deg)}
-[data-theme="dark"] .flash-back{background:#1e2d7a}
+.flash-back{background:#5a8fa0;transform:rotateY(180deg)}
+[data-theme="dark"] .flash-back{background:#1c3a4f}
 .flash-face-lbl{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0.45;margin-bottom:14px}
 .flash-front-text{font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;color:var(--text);line-height:1.5}
 .flash-back-text{font-size:13.5px;line-height:1.9;color:rgba(255,255,255,0.92);white-space:pre-wrap}
@@ -230,7 +262,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .sempty{padding:28px;text-align:center;color:var(--text3);font-size:13px}
 
 /* WRONG NOTE FAB */
-.fab{position:fixed;bottom:22px;right:22px;width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 4px 16px rgba(59,91,219,0.38);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
+.fab{position:fixed;bottom:22px;right:22px;width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:18px;box-shadow:0 4px 16px rgba(90,143,160,0.30);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform 0.2s}
 .fab:hover{transform:scale(1.1)}
 .fab-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--accent);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none}
 .fab-badge.show{display:flex}
@@ -242,10 +274,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .empty-sub{font-size:12.5px}
 
 /* PAGE BADGE */
-.pbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:4px;background:#eef2ff;color:#3b5bdb;font-size:10.5px;font-weight:600;white-space:nowrap;cursor:default;flex-shrink:0}
-[data-theme="dark"] .pbadge{background:#101830;color:#7a9eff}
+.pbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:4px;background:var(--primary-light);color:var(--primary);font-size:10.5px;font-weight:600;white-space:nowrap;cursor:default;flex-shrink:0}
+[data-theme="dark"] .pbadge{background:var(--primary-light);color:var(--primary)}
 .pbadge-lg{font-size:12.5px;padding:4px 11px}
-.sri-page{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:3px;background:#eef2ff;color:#3b5bdb;font-size:10px;font-weight:600;margin-top:3px}
+.sri-page{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:3px;background:var(--primary-light);color:var(--primary);font-size:10px;font-weight:600;margin-top:3px}
 [data-theme="dark"] .sri-page{background:#101830;color:#7a9eff}
 
 /* WRONG NOTE PAGE */
@@ -276,12 +308,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .pbadge:hover{opacity:0.78}
 
 /* ── 목차 맵 페이지 ── */
-.dday-chip{padding:3px 11px;background:#fff0f0;color:#e03131;border-radius:6px;font-size:13px;font-weight:700;font-family:'Noto Serif KR',serif;white-space:nowrap;flex-shrink:0;letter-spacing:-0.5px}
-[data-theme="dark"] .dday-chip{background:#3a0e0e;color:#ff8080}
+.dday-chip{padding:3px 11px;background:#e0edf1;color:#3a7080;border-radius:6px;font-size:13px;font-weight:700;font-family:'Noto Serif KR',serif;white-space:nowrap;flex-shrink:0;letter-spacing:-0.5px}
+[data-theme="dark"] .dday-chip{background:#1a3545;color:#78b5ca}
 .map-top{margin-bottom:18px}
 .map-dday-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
-.map-dday-big{font-family:'Noto Serif KR',serif;font-size:36px;font-weight:700;color:#e03131;letter-spacing:-2px;line-height:1}
-[data-theme="dark"] .map-dday-big{color:#ff7070}
+.map-dday-big{font-family:'Noto Serif KR',serif;font-size:36px;font-weight:700;color:#3a7080;letter-spacing:-2px;line-height:1}
+[data-theme="dark"] .map-dday-big{color:#78b5ca}
 .map-dday-info{font-size:12.5px;color:var(--text2)}
 .map-dday-exam{font-weight:700;color:var(--text)}
 .map-title{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;margin-bottom:3px}
@@ -506,7 +538,7 @@ const 친족상속_FLASHCARD = [
 // ================================================================
 const MODULES = [
   {
-    key:'채권총론', name:'채권총론', icon:'🤝', color:'#e8590c',
+    key:'채권총론', name:'채권총론', icon:'🤝', color:'#7aa8b8',
     con:채권총론_CONCEPT, cas:채권총론_CASE, qui:채권총론_QUIZ, fla:채권총론_FLASHCARD,
     topics:[
       {key:'채권일반서론',   label:'제1장 서설 — 채권 일반·채무의 분류'},
@@ -525,7 +557,7 @@ const MODULES = [
     ]
   },
   {
-    key:'채권각론', name:'채권각론', icon:'📋', color:'#9c36b5',
+    key:'채권각론', name:'채권각론', icon:'📋', color:'#6888a0',
     con:채권각론_CONCEPT, cas:채권각론_CASE, qui:채권각론_QUIZ, fla:채권각론_FLASHCARD,
     topics:[
       {key:'계약총론',   label:'제7장 계약 총론 (성립·효력·해제·해지)'},
@@ -541,7 +573,7 @@ const MODULES = [
     ]
   },
   {
-    key:'총칙', name:'민법총칙', icon:'📜', color:'#3b5bdb',
+    key:'총칙', name:'민법총칙', icon:'📜', color:'#5a8fa0',
     con:총칙_CONCEPT, cas:총칙_CASE, qui:총칙_QUIZ, fla:총칙_FLASHCARD,
     topics:[
       {key:'법원총칙서론',   label:'민법의 의의·법원·해석'},
@@ -558,7 +590,7 @@ const MODULES = [
     ]
   },
   {
-    key:'물권', name:'물권법', icon:'🏛️', color:'#0ca678',
+    key:'물권', name:'물권법', icon:'🏛️', color:'#86b4ae',
     con:물권_CONCEPT, cas:물권_CASE, qui:물권_QUIZ, fla:물권_FLASHCARD,
     topics:[
       {key:'물권총론', label:'물권 총론'},
