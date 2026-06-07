@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LawMJ Mastery</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -253,6 +254,27 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .wn-q{font-size:13.5px;color:var(--text);margin-bottom:8px;line-height:1.7}
 .wn-exp{font-size:12.5px;color:var(--text2);line-height:1.75;padding:8px 11px;background:var(--bg2);border-radius:6px}
 
+/* ── 교과서 페이지 팝업 ── */
+.pg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.pg-overlay.show{display:flex}
+.pg-modal{background:var(--card);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;max-width:min(720px,96vw);max-height:92vh;box-shadow:0 24px 64px rgba(0,0,0,0.45);width:100%}
+.pg-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.pg-hdr-title{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.pg-hdr-nav{display:flex;align-items:center;gap:6px}
+.pg-nbtn{padding:5px 11px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text2);cursor:pointer;font-size:12px;transition:all 0.15s}
+.pg-nbtn:hover{border-color:var(--primary);color:var(--primary)}
+.pg-nbtn:disabled{opacity:0.3;cursor:not-allowed}
+.pg-body{overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:14px;background:#555;flex:1;min-height:200px}
+.pg-body canvas{max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+.pg-foot{padding:8px 14px;border-top:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;font-size:11.5px;color:var(--text3)}
+/* 파일 선택 상태 */
+.pg-pick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:36px 24px;flex:1}
+.pg-pick-lbl{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:24px 32px;border:2px dashed var(--border);border-radius:12px;color:var(--text2);transition:all 0.2s;text-align:center}
+.pg-pick-lbl:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.pg-status{font-size:13px;color:var(--text3);text-align:center;padding:40px}
+.pbadge{cursor:pointer!important}
+.pbadge:hover{opacity:0.78}
+
 @media(max-width:780px){
   .sidebar{width:220px;min-width:220px;position:fixed;z-index:90;transform:translateX(-100%);transition:transform 0.28s}
   .sidebar.open{transform:translateX(0)}
@@ -295,6 +317,41 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <button class="fab" id="fab" onclick="showWrongNote()" title="오답노트">📕
   <div class="fab-badge" id="fab-badge">0</div>
 </button>
+
+
+
+<div class="pg-overlay" id="pg-overlay" onclick="pgOverlayClick(event)">
+  <div class="pg-modal" id="pg-modal">
+    <div class="pg-hdr">
+      <span class="pg-hdr-title" id="pg-title">📄 교과서 페이지</span>
+      <div class="pg-hdr-nav">
+        <button class="pg-nbtn" id="pg-prev" onclick="pgMove(-1)" disabled>◀ 이전</button>
+        <button class="pg-nbtn" id="pg-next" onclick="pgMove(1)" disabled>다음 ▶</button>
+        <button class="pg-nbtn" onclick="closePg()">✕</button>
+      </div>
+    </div>
+    <!-- 상태: 파일 미선택 -->
+    <div class="pg-pick" id="pg-pick" style="display:none">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">교과서 PDF를 한 번 선택하면 이후 자동으로 기억합니다</div>
+      <label class="pg-pick-lbl" for="pg-file-inp">
+        <span style="font-size:36px">📂</span>
+        <span style="font-size:14px;font-weight:600">로스쿨 민법의 정석.pdf 선택</span>
+        <span style="font-size:11.5px;color:var(--text3)">선택 후 이 브라우저에 영구 저장됩니다</span>
+      </label>
+      <input type="file" id="pg-file-inp" accept=".pdf" style="display:none" onchange="pgFileSelected(this)">
+    </div>
+    <!-- 상태: 로딩/렌더링 -->
+    <div class="pg-status" id="pg-status" style="display:none">⏳ 로딩 중...</div>
+    <!-- 상태: 페이지 표시 -->
+    <div class="pg-body" id="pg-body" style="display:none">
+      <canvas id="pg-canvas"></canvas>
+    </div>
+    <div class="pg-foot" id="pg-foot" style="display:none">
+      교과서 PDF는 이 브라우저에 저장되어 있습니다 &nbsp;·&nbsp;
+      <label for="pg-file-inp" style="color:var(--primary);cursor:pointer">다른 파일로 변경</label>
+    </div>
+  </div>
+</div>
 
 <script>
 // ================================================================
@@ -1012,11 +1069,7 @@ function pageText(p){
   if(p==null||p===undefined)return null;
   return Array.isArray(p)?`pp.${p[0]}–${p[1]}`:`p.${p}`;
 }
-function pageBadge(p,lg){
-  const t=pageText(p);
-  if(!t)return'';
-  return`<span class="pbadge${lg?' pbadge-lg':''}" title="교과서 ${t}">📄 ${t}</span>`;
-}
+// pageBadge → PDF 팝업 JS 섹션으로 이동
 // 페이지 범위 포함 여부: 검색 target 페이지가 항목의 page 범위 내에 있는지
 function pageInRange(itemPage, target){
   if(itemPage==null||itemPage===undefined)return false;
@@ -1039,6 +1092,157 @@ document.addEventListener('keydown',e=>{
 });
 
 // ================================================================
+// PDF 단일 페이지 팝업 + IndexedDB 영구 저장
+// ================================================================
+const PDF_IDB='lawmj_pdf_v1', PDF_STORE='pdf', PDF_KEY='book';
+let pgDoc=null, pgCurPage=1, pgRendering=false, pgPending=null, pgTargetAfterLoad=null;
+
+// ── IndexedDB 헬퍼
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(PDF_IDB,1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore(PDF_STORE);
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=rej;
+  });
+}
+async function idbSave(buf){
+  const db=await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(PDF_STORE,'readwrite');
+    tx.objectStore(PDF_STORE).put(buf,PDF_KEY);
+    tx.oncomplete=res; tx.onerror=rej;
+  });
+}
+async function idbLoad(){
+  const db=await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(PDF_STORE,'readonly');
+    const r=tx.objectStore(PDF_STORE).get(PDF_KEY);
+    r.onsuccess=()=>res(r.result||null); r.onerror=rej;
+  });
+}
+
+// ── PDF.js 초기화 + IDB에서 자동 로드
+async function pgInit(){
+  if(typeof pdfjsLib==='undefined')return;
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  try{
+    const buf=await idbLoad();
+    if(buf){await pgLoadBuf(buf);}
+  }catch(e){}
+}
+
+async function pgLoadBuf(buf){
+  pgDoc=await pdfjsLib.getDocument({data:buf}).promise;
+  document.getElementById('pg-prev').disabled=false;
+  document.getElementById('pg-next').disabled=false;
+}
+
+// ── 파일 선택 시
+async function pgFileSelected(input){
+  const file=input.files[0]; if(!file)return;
+  pgSetState('status','⏳ PDF 저장 중...');
+  const buf=await file.arrayBuffer();
+  await idbSave(buf.slice(0)); // IDB 저장
+  await pgLoadBuf(buf);        // 문서 로드
+  if(pgTargetAfterLoad!=null){
+    pgRender(pgTargetAfterLoad);
+    pgTargetAfterLoad=null;
+  } else {
+    pgRender(pgCurPage);
+  }
+}
+
+// ── 팝업 열기 (페이지 번호 지정)
+function openPage(pageNum){
+  document.getElementById('pg-overlay').classList.add('show');
+  pgCurPage=parseInt(pageNum)||1;
+  document.getElementById('pg-title').textContent=`📄 교과서 p.${pgCurPage}`;
+  if(!pgDoc){
+    // PDF 미로드 → 파일 선택 안내
+    pgTargetAfterLoad=pgCurPage;
+    pgSetState('pick');
+  } else {
+    pgRender(pgCurPage);
+  }
+}
+
+function closePg(){
+  document.getElementById('pg-overlay').classList.remove('show');
+}
+function pgOverlayClick(e){
+  if(e.target===document.getElementById('pg-overlay'))closePg();
+}
+
+// ── 페이지 렌더
+async function pgRender(num){
+  if(!pgDoc)return;
+  num=Math.min(Math.max(1,num),pgDoc.numPages);
+  if(pgRendering){pgPending=num;return}
+  pgRendering=true;
+  pgCurPage=num;
+  pgSetState('status','⏳ 렌더링 중...');
+  document.getElementById('pg-title').textContent=`📄 교과서 p.${num}`;
+  const page=await pgDoc.getPage(num);
+  // 모달 너비에 맞게 스케일 자동 계산
+  const modal=document.getElementById('pg-body');
+  const w=Math.min(modal.clientWidth-28,680);
+  const vp0=page.getViewport({scale:1});
+  const scale=Math.max(0.6,Math.min(2.5,w/vp0.width));
+  const vp=page.getViewport({scale});
+  const canvas=document.getElementById('pg-canvas');
+  const ctx=canvas.getContext('2d');
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.floor(vp.width*dpr);
+  canvas.height=Math.floor(vp.height*dpr);
+  canvas.style.width=Math.floor(vp.width)+'px';
+  canvas.style.height=Math.floor(vp.height)+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  await page.render({canvasContext:ctx,viewport:vp}).promise;
+  pgSetState('page');
+  pgRendering=false;
+  if(pgPending!==null){const q=pgPending;pgPending=null;pgRender(q)}
+}
+
+function pgMove(d){
+  if(!pgDoc)return;
+  const n=pgCurPage+d;
+  if(n>=1&&n<=pgDoc.numPages)pgRender(n);
+}
+
+// ── UI 상태 전환
+function pgSetState(state,msg){
+  const ids=['pg-pick','pg-status','pg-body','pg-foot'];
+  ids.forEach(id=>document.getElementById(id).style.display='none');
+  if(state==='pick'){
+    document.getElementById('pg-pick').style.display='flex';
+  } else if(state==='status'){
+    const el=document.getElementById('pg-status');
+    el.textContent=msg||'⏳';
+    el.style.display='block';
+  } else if(state==='page'){
+    document.getElementById('pg-body').style.display='flex';
+    document.getElementById('pg-foot').style.display='flex';
+  }
+}
+
+// ── pageBadge 클릭 가능하게 (openPage 연동)
+function pageBadge(p,lg){
+  const t=pageText(p);
+  if(!t)return'';
+  const pg=Array.isArray(p)?p[0]:p;
+  return`<span class="pbadge${lg?' pbadge-lg':''}" onclick="openPage(${pg})" title="교과서 ${t} 보기">📄 ${t}</span>`;
+}
+
+// ── 키보드: Esc로 팝업 닫기
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('pg-overlay').classList.contains('show')){
+    closePg();
+  }
+});
+
+// ================================================================
 // ⑱ INIT
 // ================================================================
 (function(){
@@ -1047,6 +1251,7 @@ document.addEventListener('keydown',e=>{
   document.documentElement.setAttribute('data-theme',theme);
   document.getElementById('theme-btn').textContent=theme==='dark'?'☀️':'🌙';
   renderSB();renderBC();renderHub();
+  pgInit(); // PDF IndexedDB 자동 로드
 })();
 </script>
 </body>
