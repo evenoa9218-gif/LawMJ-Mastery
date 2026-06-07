@@ -347,8 +347,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <canvas id="pg-canvas"></canvas>
     </div>
     <div class="pg-foot" id="pg-foot" style="display:none">
-      교과서 PDF는 이 브라우저에 저장되어 있습니다 &nbsp;·&nbsp;
-      <label for="pg-file-inp" style="color:var(--primary);cursor:pointer">다른 파일로 변경</label>
+      <span id="pg-range" style="flex:1">—</span>
+      <label for="pg-file-inp" style="color:var(--primary);cursor:pointer;flex-shrink:0">📂 파일 변경</label>
     </div>
   </div>
 </div>
@@ -1095,7 +1095,8 @@ document.addEventListener('keydown',e=>{
 // PDF 단일 페이지 팝업 + IndexedDB 영구 저장
 // ================================================================
 const PDF_IDB='lawmj_pdf_v1', PDF_STORE='pdf', PDF_KEY='book';
-let pgDoc=null, pgCurPage=1, pgRendering=false, pgPending=null, pgTargetAfterLoad=null;
+let pgDoc=null, pgCurPage=1, pgAnchor=1, pgRendering=false, pgPending=null, pgTargetAfterLoad=null;
+const PG_RANGE=20;
 
 // ── IndexedDB 헬퍼
 function idbOpen(){
@@ -1158,9 +1159,9 @@ async function pgFileSelected(input){
 function openPage(pageNum){
   document.getElementById('pg-overlay').classList.add('show');
   pgCurPage=parseInt(pageNum)||1;
+  pgAnchor=pgCurPage; // 앵커 설정 — 이 페이지 기준 ±20
   document.getElementById('pg-title').textContent=`📄 교과서 p.${pgCurPage}`;
   if(!pgDoc){
-    // PDF 미로드 → 파일 선택 안내
     pgTargetAfterLoad=pgCurPage;
     pgSetState('pick');
   } else {
@@ -1185,7 +1186,6 @@ async function pgRender(num){
   pgSetState('status','⏳ 렌더링 중...');
   document.getElementById('pg-title').textContent=`📄 교과서 p.${num}`;
   const page=await pgDoc.getPage(num);
-  // 모달 너비에 맞게 스케일 자동 계산
   const modal=document.getElementById('pg-body');
   const w=Math.min(modal.clientWidth-28,680);
   const vp0=page.getViewport({scale:1});
@@ -1201,14 +1201,29 @@ async function pgRender(num){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   await page.render({canvasContext:ctx,viewport:vp}).promise;
   pgSetState('page');
+  // 버튼 활성화 상태 업데이트
+  pgUpdateNav();
   pgRendering=false;
   if(pgPending!==null){const q=pgPending;pgPending=null;pgRender(q)}
 }
 
+function pgUpdateNav(){
+  const minP=Math.max(1, pgAnchor-PG_RANGE);
+  const maxP=Math.min(pgDoc?pgDoc.numPages:9999, pgAnchor+PG_RANGE);
+  document.getElementById('pg-prev').disabled = pgCurPage<=minP;
+  document.getElementById('pg-next').disabled = pgCurPage>=maxP;
+  // 푸터에 범위 표시
+  const foot=document.getElementById('pg-foot');
+  const rangeEl=document.getElementById('pg-range');
+  if(rangeEl) rangeEl.textContent=`p.${minP} — p.${maxP} 범위 (현재 p.${pgCurPage})`;
+}
+
 function pgMove(d){
   if(!pgDoc)return;
-  const n=pgCurPage+d;
-  if(n>=1&&n<=pgDoc.numPages)pgRender(n);
+  const minP=Math.max(1, pgAnchor-PG_RANGE);
+  const maxP=Math.min(pgDoc.numPages, pgAnchor+PG_RANGE);
+  const n=Math.min(Math.max(pgCurPage+d, minP), maxP);
+  if(n!==pgCurPage) pgRender(n);
 }
 
 // ── UI 상태 전환
